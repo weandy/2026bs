@@ -84,5 +84,10 @@ public class ReportController {
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelBytes);
     }
+    /** GET /api/admin/report/doctor-workload — 医生本周工作量排行 */
+    @GetMapping("/doctor-workload")
+    public Result<?> doctorWorkload() {
+        return Result.success(reportService.doctorWorkloadRank());
+    }
 
 }

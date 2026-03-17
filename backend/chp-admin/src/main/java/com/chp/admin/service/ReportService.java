@@ -317,4 +317,19 @@ public class ReportService {
         }
         return result;
     }
+
+    /** 医生本周工作量排行 */
+    public List<Map<String, Object>> doctorWorkloadRank() {
+        try {
+            return jdbcTemplate.queryForList(
+                "SELECT vr.staff_name AS name, COUNT(*) AS count " +
+                "FROM visit_record vr " +
+                "WHERE vr.visit_date >= CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY " +
+                "GROUP BY vr.staff_id, vr.staff_name " +
+                "ORDER BY count DESC LIMIT 10");
+        } catch (Exception e) {
+            log.warn("查询医生工作量失败", e);
+            return Collections.emptyList();
+        }
+    }
 }

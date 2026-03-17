@@ -46,7 +46,12 @@ request.interceptors.response.use(
     const originalRequest = error.config
     const status = error.response?.status
 
-    // 401: 尝试用 refreshToken 静默续签
+    // 登录接口本身的 401 = 用户名或密码错误，不触发续签
+    if (status === 401 && originalRequest.url?.includes('/auth/')) {
+      return Promise.reject(error)
+    }
+
+    // 其他接口的 401: 尝试用 refreshToken 静默续签
     if (status === 401 && !originalRequest._retry) {
       const refreshToken = localStorage.getItem('refreshToken')
       if (!refreshToken) {

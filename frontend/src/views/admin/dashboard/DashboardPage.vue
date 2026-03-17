@@ -9,12 +9,6 @@
       </el-button>
     </div>
 
-    <!-- 风险提醒条 -->
-    <div class="alert-bar alert-warn" v-if="drugAlerts.length > 0">
-      <span class="alert-icon"><TriangleAlert :size="16" /></span>
-      <span>{{ drugAlerts.length }} 种药品库存低于预警值，请及时补充</span>
-      <router-link to="/admin/drug" class="alert-action">去查看 →</router-link>
-    </div>
 
     <!-- 指标卡 -->
     <div class="summary-grid">
@@ -58,22 +52,21 @@
       </el-col>
       <el-col :xs="24" :sm="8">
         <div class="panel">
-          <h4>药品消耗 TOP5</h4>
-          <v-chart :option="barOption" style="height: 220px;" autoresize />
+          <h4>签约统计</h4>
+          <div class="panel-scroll-body" style="max-height:220px">
+            <div class="list-row"><span>当前生效签约</span><strong>{{ contractStats.active || 0 }}</strong></div>
+            <div class="list-row"><span>本月新增</span><strong class="text-good">{{ contractStats.newThisMonth || 0 }}</strong></div>
+            <div class="list-row"><span>待审核</span><strong class="text-warn">{{ contractStats.pending || 0 }}</strong></div>
+          </div>
         </div>
       </el-col>
       <el-col :xs="24" :sm="8">
         <div class="panel">
-          <h4>库存预警概览</h4>
+          <h4>随访完成率</h4>
           <div class="panel-scroll-body" style="max-height:220px">
-            <el-empty v-if="drugAlerts.length === 0" description="库存充足" :image-size="40" />
-            <div v-for="item in drugAlerts.slice(0, 6)" :key="item.name" class="alert-row">
-              <span>{{ item.name }}</span>
-              <span class="alert-qty">{{ item.currentQty }} / {{ item.alertQty }}</span>
-            </div>
-            <router-link v-if="drugAlerts.length > 6" to="/admin/drug" class="more-link">
-              查看全部 {{ drugAlerts.length }} 项 →
-            </router-link>
+            <div class="list-row"><span>本月随访计划</span><strong>{{ followUpStats.total || 0 }}</strong></div>
+            <div class="list-row"><span>已完成</span><strong class="text-good">{{ followUpStats.completed || 0 }}</strong></div>
+            <div class="list-row"><span>逾期未访</span><strong class="text-danger">{{ followUpStats.overdue || 0 }}</strong></div>
           </div>
         </div>
       </el-col>
@@ -125,18 +118,19 @@ use([CanvasRenderer, BarChart, LineChart, PieChart, GridComponent, TooltipCompon
 const todayStr = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
 
 const statCards = ref([
-  { label: '药品预警', value: '-', cls: 'mc-danger',  hint: '需要及时处理' },
-  { label: '药品总数', value: '-', cls: 'mc-primary', hint: '' },
-  { label: '员工总数', value: '-', cls: 'mc-success', hint: '' },
-  { label: '系统公告', value: '-', cls: 'mc-warn',    hint: '' }
+  { label: '签约人数', value: '-', cls: 'mc-success', hint: '当前生效签约' },
+  { label: '随访计划', value: '-', cls: 'mc-primary', hint: '进行中计划' },
+  { label: '员工总数', value: '-', cls: 'mc-warn',    hint: '' },
+  { label: '系统公告', value: '-', cls: 'mc-danger',  hint: '' }
 ])
 
 const todaySummary = ref({ totalAppt: 0, completed: 0, waiting: 0, cancelled: 0, estimated: false })
 const doctorRank = ref([])
 const isDemoRank = ref(false)
 
+const contractStats = ref({ active: 0, newThisMonth: 0, pending: 0 })
+const followUpStats = ref({ total: 0, completed: 0, overdue: 0 })
 const notices = ref([])
-const drugAlerts = ref([])
 const exporting = ref(false)
 const trendOption = ref({})
 const pieOption = ref({})
@@ -150,9 +144,6 @@ onMounted(async () => {
   try {
     const overview = await request.get('/admin/report/overview')
     const d = overview.data || {}
-    statCards.value[0].value = d.drugAlertCount ?? '-'
-    statCards.value[1].value = d.totalDrugs ?? '-'
-    drugAlerts.value = d.drugAlerts || []
 
     const staffRes = await request.get('/admin/staff', { params: { page: 1, size: 1 } })
     statCards.value[2].value = staffRes.data?.total ?? '-'
@@ -160,6 +151,22 @@ onMounted(async () => {
     const noticeRes = await request.get('/admin/notice', { params: { page: 1, size: 5 } })
     notices.value = noticeRes.data?.records || []
     statCards.value[3].value = noticeRes.data?.total ?? '-'
+
+    // 签约统计
+    try {
+      const cRes = await request.get('/admin/report/contract')
+      const cd = cRes.data || {}
+      contractStats.value = { active: cd.activeCount || 0, newThisMonth: cd.monthNew || 0, pending: cd.pendingCount || 0 }
+      statCards.value[0].value = cd.activeCount ?? '-'
+    } catch { /* ok */ }
+
+    // 随访统计
+    try {
+      const fRes = await request.get('/admin/report/follow-up')
+      const fd = fRes.data || {}
+      followUpStats.value = { total: fd.totalPlans || 0, completed: fd.completedPlans || 0, overdue: fd.overduePlans || 0 }
+      statCards.value[1].value = fd.totalPlans ?? '-'
+    } catch { /* ok */ }
 
     // 今日接诊概况（前端用已有接口简单聚合）
     try {
@@ -218,21 +225,7 @@ onMounted(async () => {
       }]
     }
 
-    // 药品消耗 TOP5
-    const drugRes = await request.get('/admin/report/drug', {
-      params: { startDate: '2026-01-01', endDate: '2026-03-15' }
-    })
-    const topList = (drugRes.data?.topConsumed || []).slice(0, 5)
-    barOption.value = {
-      tooltip: { trigger: 'axis' },
-      grid: { left: 80, right: 20, top: 10, bottom: 30 },
-      xAxis: { type: 'value' },
-      yAxis: { type: 'category', data: topList.map(i => i.drugName).reverse() },
-      series: [{
-        type: 'bar', data: topList.map(i => i.quantity).reverse(),
-        itemStyle: { color: 'var(--primary)' }, barWidth: 20
-      }]
-    }
+    // 去除药品消耗 TOP5 图表（药品模块已删除）
   } catch (e) { /* handled */ }
 })
 

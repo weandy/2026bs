@@ -156,7 +156,14 @@ async function handleLogin() {
       router.push('/medical/workbench')
     }
   } catch (e) {
-    // Axios response interceptor handles the error notification
+    const status = e.response?.status
+    if (status === 401) {
+      ElMessage.error('用户名或密码错误，请重新输入')
+    } else if (status === 400) {
+      ElMessage.error(e.response?.data?.message || '请求参数错误')
+    } else {
+      ElMessage.error('登录失败，请稍后重试')
+    }
   } finally {
     loading.value = false
   }
