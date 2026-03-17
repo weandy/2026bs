@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
 
-    <!-- ①居民 Hero -->
+    <!-- ①居民 Hero (桌面端全宽) -->
     <div class="resident-hero">
       <div class="hero-top-row">
         <span class="hero-badge">{{ greeting }}，{{ userStore.userInfo?.name || '居民' }}</span>
@@ -13,101 +13,114 @@
       <p>{{ heroSub }}</p>
     </div>
 
-    <!-- ② 今日提醒 -->
-    <div class="home-card" v-if="reminders.length > 0">
-      <div class="card-title-row">
-        <strong><Bell :size="14" class="title-icon" /> 今日提醒</strong>
-      </div>
-      <div v-for="(r, i) in reminders" :key="i" class="reminder-item">
-        <component :is="r.icon" :size="14" class="reminder-icon" />
-        <span>{{ r.text }}</span>
-      </div>
-    </div>
+    <!-- 桌面双栏包装层 -->
+    <div class="home-grid">
 
-    <!-- ③ 快捷服务 -->
-    <div class="home-card">
-      <div class="card-title-row">
-        <strong>快捷服务</strong>
-        <span class="muted">全部服务</span>
-      </div>
-      <div class="shortcut-grid">
-        <div
-          v-for="item in shortcuts"
-          :key="item.path"
-          class="shortcut-item"
-          @click="router.push(item.path)"
-        >
-          <span class="shortcut-icon" :style="{ background: item.bgColor, color: item.color }">
-            <component :is="item.icon" :size="20" />
-          </span>
-          <span>{{ item.label }}</span>
+      <!-- 左栏 -->
+      <div class="home-col home-col-left">
+
+        <!-- ② 今日提醒 -->
+        <div class="home-card" v-if="reminders.length > 0">
+          <div class="card-title-row">
+            <strong><Bell :size="14" class="title-icon" /> 今日提醒</strong>
+          </div>
+          <div v-for="(r, i) in reminders" :key="i" class="reminder-item">
+            <component :is="r.icon" :size="14" class="reminder-icon" />
+            <span>{{ r.text }}</span>
+          </div>
+        </div>
+
+        <!-- ⑤ 我的预约 -->
+        <div class="home-card">
+          <div class="card-title-row">
+            <strong>我的预约</strong>
+            <span class="muted link" @click="router.push('/resident/appointment')">查看全部</span>
+          </div>
+          <div v-if="recentAppts.length === 0" class="empty-tip">暂无预约记录</div>
+          <div v-for="appt in recentAppts" :key="appt.id" class="list-item">
+            <div>
+              <strong class="item-title">{{ appt.deptName }} · {{ appt.staffName }}</strong>
+              <span class="item-meta">
+                {{ appt.apptDate }}
+                {{ { 1: '上午', 2: '下午', 3: '晚上' }[appt.timePeriod] || '' }}
+              </span>
+            </div>
+            <span :class="['status-tag', statusClass(appt.status)]">{{ statusLabel(appt.status) }}</span>
+          </div>
+        </div>
+
+        <!-- ⑥ 消息通知 -->
+        <div class="home-card">
+          <div class="card-title-row">
+            <strong>消息通知 <span v-if="unreadCount > 0" class="badge-count">{{ unreadCount }}</span></strong>
+            <span class="muted link" @click="router.push('/resident/message')">查看全部</span>
+          </div>
+          <div v-if="recentMsgs.length === 0" class="empty-tip">暂无消息</div>
+          <div v-for="msg in recentMsgs" :key="msg.id" class="msg-line" :class="{ unread: msg.isRead === 0 }">
+            {{ msg.content || msg.title }}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ④ 健康摘要 -->
-    <div class="home-card" v-if="healthSummary">
-      <div class="card-title-row">
-        <strong><Activity :size="14" class="title-icon" /> 健康摘要</strong>
-        <span class="muted link" @click="router.push('/resident/health-record')">查看详情</span>
-      </div>
-      <div class="health-grid">
-        <div v-for="v in healthVitals" :key="v.label" class="health-item">
-          <span class="health-label">{{ v.label }}</span>
-          <span class="health-value">{{ v.value || '--' }}</span>
+      <!-- 右栏 -->
+      <div class="home-col home-col-right">
+
+        <!-- ③ 快捷服务 -->
+        <div class="home-card">
+          <div class="card-title-row">
+            <strong>快捷服务</strong>
+            <span class="muted">全部服务</span>
+          </div>
+          <div class="shortcut-grid">
+            <div
+              v-for="item in shortcuts"
+              :key="item.path"
+              class="shortcut-item"
+              @click="router.push(item.path)"
+            >
+              <span class="shortcut-icon" :style="{ background: item.bgColor, color: item.color }">
+                <component :is="item.icon" :size="20" />
+              </span>
+              <span>{{ item.label }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 健康摘要 -->
+        <div class="home-card" v-if="healthSummary">
+          <div class="card-title-row">
+            <strong><Activity :size="14" class="title-icon" /> 健康摘要</strong>
+            <span class="muted link" @click="router.push('/resident/health-record')">查看详情</span>
+          </div>
+          <div class="health-grid">
+            <div v-for="v in healthVitals" :key="v.label" class="health-item">
+              <span class="health-label">{{ v.label }}</span>
+              <span class="health-value">{{ v.value || '--' }}</span>
+            </div>
+          </div>
+          <div v-if="healthSummary.chronicles?.length" class="chronic-tags-row">
+            <span v-for="c in healthSummary.chronicles" :key="c"
+              :class="['chronic-tag', c]">{{ chronicLabel(c) }}</span>
+          </div>
+        </div>
+
+        <!-- A5 社区公告 -->
+        <div class="home-card" v-if="notices.length > 0">
+          <div class="card-title-row">
+            <strong>社区公告</strong>
+          </div>
+          <div v-for="notice in notices" :key="notice.id" class="notice-item">
+            <div class="notice-title-row">
+              <span v-if="notice.isTop" class="top-badge">置顶</span>
+              <strong>{{ notice.title }}</strong>
+            </div>
+            <p class="notice-content">{{ notice.content }}</p>
+            <span class="notice-date">{{ notice.publishedAt?.split('T')[0] || '' }}</span>
+          </div>
         </div>
       </div>
-      <div v-if="healthSummary.chronicles?.length" class="chronic-tags-row">
-        <span v-for="c in healthSummary.chronicles" :key="c"
-          :class="['chronic-tag', c]">{{ chronicLabel(c) }}</span>
-      </div>
-    </div>
 
-    <!-- ⑤ 我的预约 -->
-    <div class="home-card">
-      <div class="card-title-row">
-        <strong>我的预约</strong>
-        <span class="muted link" @click="router.push('/resident/appointment')">查看全部</span>
-      </div>
-      <div v-if="recentAppts.length === 0" class="empty-tip">暂无预约记录</div>
-      <div v-for="appt in recentAppts" :key="appt.id" class="list-item">
-        <div>
-          <strong class="item-title">{{ appt.deptName }} · {{ appt.staffName }}</strong>
-          <span class="item-meta">
-            {{ appt.apptDate }}
-            {{ { 1: '上午', 2: '下午', 3: '晚上' }[appt.timePeriod] || '' }}
-          </span>
-        </div>
-        <span :class="['status-tag', statusClass(appt.status)]">{{ statusLabel(appt.status) }}</span>
-      </div>
-    </div>
-
-    <!-- ⑥ 消息通知 -->
-    <div class="home-card">
-      <div class="card-title-row">
-        <strong>消息通知 <span v-if="unreadCount > 0" class="badge-count">{{ unreadCount }}</span></strong>
-        <span class="muted link" @click="router.push('/resident/message')">查看全部</span>
-      </div>
-      <div v-if="recentMsgs.length === 0" class="empty-tip">暂无消息</div>
-      <div v-for="msg in recentMsgs" :key="msg.id" class="msg-line" :class="{ unread: msg.isRead === 0 }">
-        {{ msg.content || msg.title }}
-      </div>
-    </div>
-
-    <!-- A5 社区公告 -->
-    <div class="home-card" v-if="notices.length > 0">
-      <div class="card-title-row">
-        <strong>社区公告</strong>
-      </div>
-      <div v-for="notice in notices" :key="notice.id" class="notice-item">
-        <div class="notice-title-row">
-          <span v-if="notice.isTop" class="top-badge">置顶</span>
-          <strong>{{ notice.title }}</strong>
-        </div>
-        <p class="notice-content">{{ notice.content }}</p>
-        <span class="notice-date">{{ notice.publishedAt?.split('T')[0] || '' }}</span>
-      </div>
-    </div>
+    </div><!-- /.home-grid -->
 
   </div>
 </template>
@@ -237,6 +250,27 @@ onMounted(async () => {
   padding: 16px 16px 8px;
   max-width: 500px;
   margin: 0 auto;
+}
+
+/* ══ 桌面双栏布局 (≥ 768px) ══ */
+.home-grid {
+  display: block; /* 移动端单栏 */
+}
+
+@media (min-width: 768px) {
+  .home-page {
+    max-width: 1100px;
+    padding: 24px 32px 16px;
+  }
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .shortcut-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
 }
 
 /* ── Hero 顶行 ── */
