@@ -264,4 +264,57 @@ public class ReportService {
             throw new RuntimeException("导出报表失败", e);
         }
     }
+
+    /** 随访完成率统计 */
+    public Map<String, Object> followUpReport() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Integer totalPlans = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM follow_up_plan WHERE is_deleted = 0", Integer.class);
+            Integer completedPlans = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM follow_up_plan WHERE is_deleted = 0 AND status = 2", Integer.class);
+            Integer activePlans = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM follow_up_plan WHERE is_deleted = 0 AND status = 1", Integer.class);
+            Integer thisMonthDue = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM follow_up_plan WHERE is_deleted = 0 AND status = 1 AND next_follow_date <= LAST_DAY(CURDATE())",
+                    Integer.class);
+            Integer totalRecords = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM follow_up_record", Integer.class);
+
+            result.put("totalPlans", totalPlans != null ? totalPlans : 0);
+            result.put("completedPlans", completedPlans != null ? completedPlans : 0);
+            result.put("activePlans", activePlans != null ? activePlans : 0);
+            result.put("thisMonthDue", thisMonthDue != null ? thisMonthDue : 0);
+            result.put("totalRecords", totalRecords != null ? totalRecords : 0);
+            result.put("completionRate", totalPlans != null && totalPlans > 0
+                    ? Math.round((completedPlans != null ? completedPlans : 0) * 100.0 / totalPlans) : 0);
+        } catch (Exception e) {
+            log.warn("查询随访统计失败", e);
+        }
+        return result;
+    }
+
+    /** 签约统计 */
+    public Map<String, Object> contractReport() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Integer total = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM service_contract", Integer.class);
+            Integer active = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM service_contract WHERE status = 1", Integer.class);
+            Integer expired = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM service_contract WHERE status != 1", Integer.class);
+            Integer thisMonth = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM service_contract WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())",
+                    Integer.class);
+
+            result.put("total", total != null ? total : 0);
+            result.put("active", active != null ? active : 0);
+            result.put("expired", expired != null ? expired : 0);
+            result.put("thisMonth", thisMonth != null ? thisMonth : 0);
+        } catch (Exception e) {
+            log.warn("查询签约统计失败", e);
+        }
+        return result;
+    }
 }

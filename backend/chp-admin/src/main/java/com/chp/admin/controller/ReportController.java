@@ -53,6 +53,18 @@ public class ReportController {
         return Result.success(reportService.vaccineReport());
     }
 
+    /** GET /api/admin/report/follow-up — 随访完成率统计 */
+    @GetMapping("/follow-up")
+    public Result<Map<String, Object>> followUp() {
+        return Result.success(reportService.followUpReport());
+    }
+
+    /** GET /api/admin/report/contract — 签约统计 */
+    @GetMapping("/contract")
+    public Result<Map<String, Object>> contract() {
+        return Result.success(reportService.contractReport());
+    }
+
     /** GET /api/admin/report/appointment?startDate=&endDate=&deptCode= — 预约趋势 */
     @GetMapping("/appointment")
     public Result<Map<String, Object>> appointmentTrend(

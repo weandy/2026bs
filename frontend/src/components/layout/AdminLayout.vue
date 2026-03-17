@@ -121,11 +121,11 @@ function toggleDark() {
 
 /* ── 导航配置 —— 侧边栏 & 移动端共用 ── */
 const medicalNav = computed(() => [
-  { path: '/medical/workbench',     label: '接诊工作台', shortLabel: '工作台', icon: MonitorIcon },
+  { path: '/medical/workbench',     label: '接诊工作台', shortLabel: '工作台', icon: MonitorIcon, visible: userRole.value !== 'NURSE' },
   { path: '/medical/record-manage', label: '居民档案',   shortLabel: '档案',   icon: FolderOpen },
   { path: '/medical/follow-up',     label: '签约与随访', shortLabel: '随访',   icon: ClipboardList },
-  { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe },
-  { path: '/medical/prescription',  label: '处方记录',   shortLabel: '处方',   icon: FileText },
+  { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe, visible: userRole.value !== 'DOCTOR' },
+  { path: '/medical/prescription',  label: '处方记录',   shortLabel: '处方',   icon: FileText, visible: userRole.value !== 'NURSE' },
   { path: '/medical/my-schedule',   label: '我的排班',   shortLabel: '排班',   icon: CalendarDays },
 ])
 
