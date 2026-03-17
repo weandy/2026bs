@@ -130,6 +130,25 @@
         </div>
       </div>
     </div>
+    <!-- 创新点②：随访建议确认弹窗 -->
+    <el-dialog v-model="showFollowUpDlg" title="随访计划建议" width="480px" :close-on-click-modal="false">
+      <template v-if="followUpSuggestion">
+        <div class="follow-up-suggestion">
+          <div class="fus-header">
+            <span :class="['chronic-tag', followUpSuggestion.chronicType]">{{ followUpSuggestion.chronicLabel }}</span>
+            <span class="fus-hint">系统根据患者慢病类型自动推荐</span>
+          </div>
+          <div class="fus-row"><strong>建议频率：</strong>每 {{ followUpSuggestion.frequency }} 天 1 次</div>
+          <div class="fus-row"><strong>下次随访：</strong>{{ followUpSuggestion.nextFollowDate }}</div>
+          <div class="fus-row"><strong>随访方式：</strong>{{ followUpSuggestion.followUpMethod === 1 ? '电话随访' : '门诊随访' }}</div>
+          <div class="fus-row"><strong>重点关注：</strong>{{ followUpSuggestion.focusItems }}</div>
+        </div>
+      </template>
+      <template #footer>
+        <el-button @click="showFollowUpDlg = false; followUpSuggestion = null">暂不创建</el-button>
+        <el-button type="primary" @click="confirmFollowUp" :loading="followUpCreating">确认创建随访计划</el-button>
+      </template>
+    </el-dialog>
 
     <!-- 快速开方弹窗（保留，后续迭代可改内嵌） -->
     <el-dialog v-model="showPrescDlg" title="快速开方" width="700px">
@@ -253,7 +272,7 @@ async function completeVisit() {
   if (!valid) return
   completing.value = true
   try {
-    await request.put(`/medical/workbench/complete/${currentVisit.value.id}`, visitForm)
+    const res = await request.put(`/medical/workbench/complete/${currentVisit.value.id}`, visitForm)
     ElMessage.success('接诊完成，可就此为患者开处方')
     lastVisitId.value = currentVisit.value.id
     prescForm.notes = ''
@@ -261,8 +280,41 @@ async function completeVisit() {
     showPrescDlg.value = true
     currentVisit.value = null
     refreshQueue()
+
+    // 创新点②：检查随访建议
+    const data = res.data || res
+    if (data.followUpSuggestion) {
+      followUpSuggestion.value = data.followUpSuggestion
+      showFollowUpDlg.value = true
+    }
   } catch (e) { console.warn(e) }
   finally { completing.value = false }
+}
+
+// 创新点②：随访智能闭环
+const showFollowUpDlg = ref(false)
+const followUpSuggestion = ref(null)
+const followUpCreating = ref(false)
+
+async function confirmFollowUp() {
+  if (!followUpSuggestion.value) return
+  followUpCreating.value = true
+  try {
+    const s = followUpSuggestion.value
+    await request.post('/medical/follow-up/plan', {
+      residentId: s.residentId,
+      chronicType: s.chronicType,
+      doctorId: s.doctorId,
+      doctorName: s.doctorName,
+      frequency: s.frequency,
+      followUpMethod: s.followUpMethod,
+      nextFollowDate: s.nextFollowDate
+    })
+    ElMessage.success('随访计划已创建')
+    showFollowUpDlg.value = false
+    followUpSuggestion.value = null
+  } catch (e) { ElMessage.error('创建随访计划失败') }
+  finally { followUpCreating.value = false }
 }
 
 const showPrescDlg = ref(false)
@@ -483,6 +535,13 @@ onMounted(() => refreshQueue())
   align-items: center;
   justify-content: center;
 }
+
+/* 随访建议弹窗 */
+.follow-up-suggestion { display: flex; flex-direction: column; gap: 12px; }
+.fus-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.fus-hint { font-size: 12px; color: var(--muted); }
+.fus-row { font-size: 14px; line-height: 1.8; color: var(--text); }
+.fus-row strong { color: var(--text-strong); }
 
 /* 处方弹窗行 */
 .presc-item-row { margin-bottom: 8px; }

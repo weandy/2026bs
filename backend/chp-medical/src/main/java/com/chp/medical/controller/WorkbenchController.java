@@ -1,5 +1,4 @@
 package com.chp.medical.controller;
-
 import com.chp.common.result.Result;
 import com.chp.resident.entity.VisitRecord;
 import com.chp.medical.service.WorkbenchService;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.chp.common.annotation.AuditLog;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/medical/workbench")
@@ -38,8 +38,8 @@ public class WorkbenchController {
 
     @PutMapping("/complete/{visitId}")
     @AuditLog(type = "VISIT_COMPLETE", module = "workbench", description = "完成接诊")
-    public Result<Void> completeVisit(@PathVariable Long visitId, @RequestBody CompleteVisitDTO dto) {
-        workbenchService.completeVisit(visitId, dto.getChiefComplaint(), dto.getDiagnosis(), dto.getTreatmentPlan());
-        return Result.success();
+    public Result<Map<String, Object>> completeVisit(@PathVariable Long visitId, @RequestBody CompleteVisitDTO dto) {
+        Map<String, Object> result = workbenchService.completeVisit(visitId, dto.getChiefComplaint(), dto.getDiagnosis(), dto.getTreatmentPlan());
+        return Result.success(result);
     }
 }
