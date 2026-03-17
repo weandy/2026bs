@@ -6,7 +6,7 @@
       <div class="hero-top-row">
         <span class="hero-badge">{{ greeting }}，{{ userStore.userInfo?.name || '居民' }}</span>
         <button class="elder-toggle-btn" @click="uiStore.toggleElder()">
-          当前：{{ uiStore.elderMode ? '敬老版' : '标准版' }} · 切换
+          {{ uiStore.elderMode ? '敬老版 · 已开启' : '切换长辈版' }}
         </button>
       </div>
       <h4>{{ heroTitle }}</h4>
@@ -143,14 +143,24 @@ const greeting = computed(() => {
 })
 
 const heroTitle = computed(() => {
-  const n = unreadCount.value
-  if (n > 0) return `您有 ${n} 条健康消息`
   return '社区卫生服务中心'
 })
 
 const heroSub = computed(() => {
-  const n = unreadCount.value
-  return n > 0 ? `请及时查看` : '预约挂号 · 健康档案 · 慢病随访 · 公共卫生'
+  const msgs = unreadCount.value
+  const appts = recentAppts.value.length
+  const nts = notices.value.length
+
+  if (msgs > 0 || appts > 0) {
+    const parts = []
+    if (appts > 0) parts.push(`${appts} 个待就诊预约`)
+    if (msgs > 0) parts.push(`${msgs} 条未读消息`)
+    return `您有 ${parts.join('，')}，请及时查看`
+  }
+  if (nts > 0) {
+    return `您有 ${nts} 条社区公告待查看`
+  }
+  return '预约挂号、健康档案和就诊记录可在首页快捷进入'
 })
 
 const shortcuts = [
@@ -234,19 +244,20 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .elder-toggle-btn {
-  padding: 4px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.35);
   background: rgba(255,255,255,0.14);
   color: rgba(255,255,255,0.88);
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   font-family: var(--font-sans);
   transition: all 0.2s ease;
+  min-height: 36px;
 }
 .elder-toggle-btn:hover { background: rgba(255,255,255,0.22); }
 
@@ -279,22 +290,23 @@ onMounted(async () => {
 
 .hero-badge {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.18);
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
   position: relative; z-index: 1;
 }
 .resident-hero h4 {
-  margin: 0 0 6px;
-  font-size: 22px;
+  margin: 0 0 8px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.3;
   position: relative; z-index: 1;
 }
 .resident-hero p {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.88;
   position: relative; z-index: 1;
 }
