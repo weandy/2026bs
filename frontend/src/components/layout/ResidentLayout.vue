@@ -1,299 +1,398 @@
 <template>
-  <div class="resident-layout">
-
-    <!-- PC 端顶部导航 (>= 768px 可见) -->
-    <header class="desktop-topbar">
-      <div class="topbar-inner">
-        <div class="topbar-brand">
-          <span class="brand-icon">+</span>
-          <span class="brand-name">社区卫生服务中心</span>
+  <el-container class="resident-layout">
+    <!-- 侧边栏（桌面端） -->
+    <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar" :class="{ collapsed: isCollapsed }">
+      <div class="logo">
+        <div class="logo-icon">
+          <Plus :size="18" />
         </div>
-        <nav class="topbar-nav">
-          <router-link
-            v-for="tab in tabs"
-            :key="tab.to"
-            :to="tab.to"
-            class="topbar-link"
-            active-class="active"
-          >
-            <component :is="tab.icon" :size="16" />
-            <span>{{ tab.label }}</span>
-          </router-link>
-        </nav>
-        <div class="topbar-right">
-          <span class="topbar-user">{{ userStore.userInfo?.name || '居民' }}</span>
-          <button class="topbar-logout" @click="handleLogout">退出</button>
-        </div>
+        <span v-if="!isCollapsed" class="logo-text">社区卫生服务中心</span>
       </div>
-    </header>
+      <el-menu :default-active="$route.path" router :collapse="isCollapsed">
+        <!-- 核心服务 -->
+        <div v-if="!isCollapsed" class="nav-group-label">核心服务</div>
+        <el-menu-item v-for="item in coreNav" :key="item.path" :index="item.path">
+          <el-icon><component :is="item.icon" :size="16" /></el-icon>
+          <template #title>{{ item.label }}</template>
+        </el-menu-item>
+        <!-- 健康管理 -->
+        <div v-if="!isCollapsed" class="nav-group-label">健康管理</div>
+        <el-menu-item v-for="item in healthNav" :key="item.path" :index="item.path">
+          <el-icon><component :is="item.icon" :size="16" /></el-icon>
+          <template #title>{{ item.label }}</template>
+        </el-menu-item>
+        <!-- 个人 -->
+        <div v-if="!isCollapsed" class="nav-group-label">个人</div>
+        <el-menu-item v-for="item in personalNav" :key="item.path" :index="item.path">
+          <el-icon><component :is="item.icon" :size="16" /></el-icon>
+          <template #title>{{ item.label }}</template>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
 
-    <div class="resident-content">
-      <router-view v-slot="{ Component }">
-        <transition name="slide" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </div>
+    <!-- 右侧主区域 -->
+    <el-container class="main-container">
+      <el-header class="topbar">
+        <div class="topbar-left">
+          <button class="collapse-btn" @click="isCollapsed = !isCollapsed">
+            <Menu :size="18" />
+          </button>
+          <span class="page-title">{{ $route.meta.title }}</span>
+        </div>
+        <div class="topbar-right">
+          <span class="user-name">{{ userStore.userInfo?.name }}</span>
+          <button class="logout-btn" @click="handleLogout" data-testid="btn-logout">退出</button>
+        </div>
+      </el-header>
+      <el-main>
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </el-main>
+    </el-container>
+  </el-container>
 
-    <!-- 移动端底部 Tab bar (< 768px 可见) -->
-    <nav class="bottom-tabbar">
+  <!-- 移动端底部导航 — 5 主入口 -->
+  <nav class="mobile-tabbar">
+    <router-link
+      v-for="tab in mobileTabs"
+      :key="tab.path"
+      :to="tab.path"
+      class="m-tab"
+      active-class="active"
+    >
+      <component :is="tab.icon" :size="20" />
+      <span>{{ tab.shortLabel }}</span>
+    </router-link>
+    <button v-if="moreItems.length > 0" class="m-tab" @click="moreDrawerVisible = true">
+      <Menu :size="20" />
+      <span>更多</span>
+    </button>
+  </nav>
+
+  <!-- 更多导航抽屉 -->
+  <el-drawer v-model="moreDrawerVisible" title="全部功能" direction="btt" size="auto" :with-header="true">
+    <div class="more-nav-list">
       <router-link
-        v-for="tab in tabs"
-        :key="tab.to"
-        :to="tab.to"
-        class="tab-item"
+        v-for="item in allNav"
+        :key="item.path"
+        :to="item.path"
+        class="more-nav-item"
         active-class="active"
-        :data-testid="`tab-${tab.key}`"
+        @click="moreDrawerVisible = false"
       >
-        <span class="tab-icon"><component :is="tab.icon" :size="22" /></span>
-        <span class="tab-label">{{ tab.label }}</span>
+        <component :is="item.icon" :size="18" />
+        <span>{{ item.label }}</span>
       </router-link>
-    </nav>
-  </div>
+    </div>
+  </el-drawer>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUiStore } from '@/stores/uiStore'
 import { useUserStore } from '@/stores/user'
-import { Home, CalendarDays, FileText, Bell, UserRound } from 'lucide-vue-next'
+import { forceLogout } from '@/utils/request'
+import {
+  Home, CalendarDays, Clock, FileText, FolderOpen,
+  Syringe, Users, UserRound, Plus, Menu
+} from 'lucide-vue-next'
 
-const router    = useRouter()
-const uiStore   = useUiStore()
 const userStore = useUserStore()
+const router = useRouter()
+const isCollapsed = ref(false)
+const moreDrawerVisible = ref(false)
 
-const tabs = [
-  { key: 'home', to: '/resident/home', label: '首页', icon: Home },
-  { key: 'appointment', to: '/resident/appointment', label: '预约', icon: CalendarDays },
-  { key: 'visit', to: '/resident/visit-records', label: '就诊', icon: FileText },
-  { key: 'health', to: '/resident/health-record', label: '档案', icon: Bell },
-  { key: 'profile', to: '/resident/profile', label: '我的', icon: UserRound },
+/* ── 分组导航 ── */
+const coreNav = [
+  { path: '/resident/home',           label: '服务首页', icon: Home },
+  { path: '/resident/appointment',    label: '预约挂号', icon: CalendarDays },
+  { path: '/resident/queue-progress', label: '候诊进度', icon: Clock },
+  { path: '/resident/visit-records',  label: '就诊记录', icon: FileText },
 ]
 
-function handleLogout() {
-  userStore.logout()
-  router.push('/login')
-}
+const healthNav = [
+  { path: '/resident/health-record', label: '我的档案', icon: FolderOpen },
+  { path: '/resident/vaccine',       label: '疫苗接种', icon: Syringe },
+]
 
-onMounted(() => {
-  uiStore.setHeaderHeight(64)
-})
+const personalNav = [
+  { path: '/resident/family',  label: '家庭成员', icon: Users },
+  { path: '/resident/profile', label: '个人中心', icon: UserRound },
+]
+
+const allNav = computed(() => [...coreNav, ...healthNav, ...personalNav])
+
+/* ── 移动端 Tab（前 4 个 + 更多） ── */
+const mobileTabs = [
+  { path: '/resident/home',        shortLabel: '首页', icon: Home },
+  { path: '/resident/appointment', shortLabel: '预约', icon: CalendarDays },
+  { path: '/resident/visit-records', shortLabel: '就诊', icon: FileText },
+  { path: '/resident/health-record', shortLabel: '档案', icon: FolderOpen },
+]
+
+const moreItems = computed(() => allNav.value.filter(n => !mobileTabs.some(t => t.path === n.path)))
+
+function handleLogout() {
+  forceLogout()
+}
 </script>
 
 <style scoped>
-.resident-layout {
+/* ═══════════════════════════════════════
+   整体布局
+═══════════════════════════════════════ */
+.resident-layout { height: 100vh; }
+
+/* ═══════════════════════════════════════
+   侧边栏
+═══════════════════════════════════════ */
+.sidebar {
+  background: var(--surface-soft);
+  border-right: 1px solid var(--border);
+  transition: width 0.25s ease;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  max-width: 100vw;
-  overflow-x: hidden;
-  background: var(--bg);
-}
-
-.resident-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: 72px;
-  width: 100%;
-  max-width: 100vw;
-}
-
-/* ══════════════════════════════════════════
-   PC 端顶部导航 (>= 768px)
-   ══════════════════════════════════════════ */
-.desktop-topbar {
-  display: none;     /* 移动端默认隐藏 */
-}
-
-@media (min-width: 768px) {
-  .desktop-topbar {
-    display: block;
-    position: sticky;
-    top: 0;
-    z-index: 200;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 1px 8px rgba(35, 49, 45, 0.06);
-  }
-
-  .topbar-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    height: 56px;
-  }
-
-  .topbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--primary-strong);
-    white-space: nowrap;
-  }
-
-  .brand-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--primary);
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .topbar-nav {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .topbar-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--muted);
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-  .topbar-link:hover {
-    background: var(--primary-light);
-    color: var(--primary-strong);
-  }
-  .topbar-link.active {
-    background: var(--primary-light-hover);
-    color: var(--primary-strong);
-    font-weight: 600;
-  }
-
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 13px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  .topbar-user {
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .topbar-logout {
-    padding: 5px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--font-sans);
-  }
-  .topbar-logout:hover {
-    background: var(--bg-danger);
-    color: var(--text-danger);
-    border-color: var(--danger);
-  }
-
-  /* PC 端隐藏底部 Tab + 取消 content 的 bottom padding */
-  .bottom-tabbar {
-    display: none !important;
-  }
-  .resident-content {
-    padding-bottom: 0;
-  }
-}
-
-/* ══════════════════════════════════════════
-   移动端底部 Tab bar (< 768px)
-   ══════════════════════════════════════════ */
-.bottom-tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  padding: 8px 12px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -4px 24px rgba(35, 49, 45, 0.08);
-  z-index: 100;
-}
-html.dark .bottom-tabbar {
-  background: rgba(30, 30, 30, 0.75);
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
-}
-
-.tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
-  padding: 7px 4px;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.tab-item:hover {
-  background: var(--primary-light);
-  color: var(--primary-strong);
-}
-
-.tab-item.active {
-  background: var(--primary-light-hover);
-  color: var(--primary-strong);
-  font-weight: 700;
-}
-
-.tab-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
   flex-shrink: 0;
 }
 
-.tab-icon :deep(svg) {
-  display: block;
-  width: 100%;
-  height: 100%;
+/* Logo 区域 */
+.logo {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.tab-label {
-  font-size: 10px;
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-light);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--primary-strong);
+}
+
+.logo-text {
+  color: var(--primary-strong);
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
+/* 导航分组标签 */
+.nav-group-label {
+  padding: 16px 20px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Element Plus 菜单覆盖 */
+.sidebar :deep(.el-menu) {
+  background: transparent !important;
+  border-right: none !important;
+  padding: 0;
+}
+
+.sidebar :deep(.el-menu-item) {
+  margin: 2px 8px;
+  height: 40px;
+  border-radius: 10px;
+  color: var(--muted) !important;
+  font-size: 13.5px;
+  transition: all 0.2s ease;
+}
+
+.sidebar :deep(.el-menu-item:hover) {
+  background: var(--primary-light) !important;
+  color: var(--primary-strong) !important;
+}
+
+.sidebar :deep(.el-menu-item.is-active) {
+  background: var(--primary-light) !important;
+  color: var(--primary-strong) !important;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.sidebar :deep(.el-menu-item .el-icon) {
+  color: inherit !important;
+}
+
+/* 折叠时图标居中 */
+.sidebar.collapsed :deep(.el-menu-item) {
+  margin: 2px 4px;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════
+   顶栏
+═══════════════════════════════════════ */
+.main-container { overflow: hidden; max-width: 100vw; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 0 20px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.collapse-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+.collapse-btn:hover { background: var(--primary-light); color: var(--primary-strong); }
+.collapse-btn svg { width: 18px; height: 18px; }
+
+.page-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.user-name { font-size: 14px; color: var(--text); }
+
+.logout-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+}
+.logout-btn:hover { background: var(--bg-danger); border-color: var(--danger); color: var(--danger); }
+
 /* 路由过渡 */
-.slide-enter-active, .slide-leave-active { transition: all 0.22s ease; }
-.slide-enter-from  { opacity: 0; transform: translateY(8px); }
-.slide-leave-to    { opacity: 0; transform: translateY(-4px); }
+.fade-enter-active, .fade-leave-active { transition: all 0.22s ease; }
+.fade-enter-from  { opacity: 0; transform: translateY(8px); }
+.fade-leave-to    { opacity: 0; transform: translateY(-4px); }
+
+/* ═══════════════════════════════════════
+   移动端底部导航（≤ 768px）
+═══════════════════════════════════════ */
+.mobile-tabbar { display: none; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none !important; }
+
+  .main-container { flex-direction: column; }
+
+  .main-container :deep(.el-main) {
+    padding: 12px;
+    padding-bottom: 80px;
+    overflow-y: auto;
+  }
+
+  .collapse-btn { display: none; }
+
+  .mobile-tabbar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -4px 20px rgba(35, 49, 45, 0.08);
+    padding: 6px 8px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 200;
+  }
+
+  .m-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+  .m-tab svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .m-tab:hover { background: var(--primary-light); color: var(--primary-strong); }
+
+  .m-tab.active {
+    color: var(--primary-strong);
+    background: var(--primary-light);
+    font-weight: 700;
+  }
+}
+
+/* ── 更多导航抽屉内容 ── */
+.more-nav-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 8px 12px 20px;
+}
+.more-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.more-nav-item:hover,
+.more-nav-item.active {
+  background: var(--primary-light);
+  color: var(--primary-strong);
+}
 </style>

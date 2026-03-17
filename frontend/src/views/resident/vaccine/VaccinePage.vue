@@ -180,7 +180,7 @@ onMounted(() => loadAvailable())
 /* ══ PC 桌面端 (≥ 768px) ══ */
 @media (min-width: 768px) {
   .vaccine-page {
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 16px 24px;
   }

@@ -380,12 +380,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.appointment-page { padding: 16px; max-width: 860px; margin: 0 auto; }
+.appointment-page { padding: 16px; max-width: 100%; margin: 0 auto; }
 
 /* ══ PC 桌面端 (≥ 768px) ══ */
 @media (min-width: 768px) {
   .appointment-page {
-    max-width: 1100px;
+    max-width: 100%;
     padding: 24px 32px;
   }
 }

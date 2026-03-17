@@ -246,7 +246,7 @@ onMounted(async () => {
 <style scoped>
 .home-page {
   padding: 16px 16px 8px;
-  max-width: 500px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -257,7 +257,7 @@ onMounted(async () => {
 
 @media (min-width: 768px) {
   .home-page {
-    max-width: 1100px;
+    max-width: 100%;
     padding: 24px 32px 16px;
   }
   .home-grid {

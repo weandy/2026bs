@@ -260,7 +260,7 @@ const saveContact = async () => {
 /* ══ PC 桌面端双栏布局 (≥ 768px) ══ */
 @media (min-width: 768px) {
   .profile-page {
-    max-width: 1000px;
+    max-width: 100%;
     padding: 24px 32px;
   }
 
