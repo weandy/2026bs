@@ -1,0 +1,16 @@
+Login OK, token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlI
+Profile: {
+  "address": "海淀区学院路",
+  "gender": 1,
+  "phone": "138****0001",
+  "idCard": "1101**********0011",
+  "name": "张建国",
+  "id": 2,
+  "bloodType": "A",
+  "birthDate": "1965-03-15"
+}
+Wrong old pwd rejected: 400 {"code":400,"message":"旧密码错误","timestamp":1773553371278}
+Password changed: {'code': 200, 'message': '操作成功', 'timestamp': 1773553371628}
+Login with new pwd: 200
+Password restored: {'code': 200, 'message': '操作成功', 'timestamp': 1773553372171}
+ALL TESTS PASSED

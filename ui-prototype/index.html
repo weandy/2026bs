@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区卫生服务中心平台 UI 高保真原型</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="brand">
+        <div class="brand-mark">CH</div>
+        <div>
+          <h1>社区卫生服务中心平台</h1>
+          <p>UI High-Fidelity Prototype</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#overview">设计概览</a>
+        <a href="#login">登录页</a>
+        <a href="#resident-home">居民首页</a>
+        <a href="#appointment">预约挂号</a>
+        <a href="#record">健康档案</a>
+        <a href="#visit">就诊记录</a>
+        <a href="#medical">医护工作台</a>
+        <a href="#prescription">电子处方</a>
+        <a href="#pharmacy">药房发药</a>
+        <a href="#followup">随访公卫</a>
+        <a href="#admin">管理驾驶舱</a>
+        <a href="#schedule">排班管理</a>
+        <a href="#inventory">库存管理</a>
+      </nav>
+      <div class="rail-note">
+        <strong>原型原则</strong>
+        <p>医疗青绿为主色，信息层级优先，居民端移动优先，医护与管理端桌面优先。</p>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="hero" id="overview">
+        <div>
+          <span class="eyebrow">基于 Spring Boot 的社区卫生服务中心平台</span>
+          <h2>更像医疗民生平台，而不是默认后台模板</h2>
+          <p>这一版原型统一了居民端、医护端、管理员端的视觉语言。整体风格强调可信、清洁、稳定和高可读性，适合毕业设计展示，也具备后续产品化演进的基础。</p>
+        </div>
+        <div class="hero-panel">
+          <div class="token-card"><span>主品牌色</span><strong>#2F6B57</strong></div>
+          <div class="token-card"><span>医护辅色</span><strong>#4D6F99</strong></div>
+          <div class="token-card"><span>管理强调</span><strong>#9B7441</strong></div>
+          <div class="token-card"><span>页面背景</span><strong>#F6F7F4</strong></div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="login">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">公共入口</span>
+            <h3>登录页</h3>
+          </div>
+          <p>双栏机构入口，左侧展示平台定位和服务价值，右侧承载角色登录。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="login-hero">
+            <div class="hero-copy">
+              <span class="badge">社区医疗 · 民生服务 · 一体化协同</span>
+              <h4>社区卫生服务中心平台</h4>
+              <p>覆盖居民便民、医护接诊、公卫管理、运营配置的统一数字平台。</p>
+              <div class="feature-grid">
+                <div class="feature-card"><strong>预约更便捷</strong><span>挂号、档案、接种、消息一站式完成</span></div>
+                <div class="feature-card"><strong>接诊更高效</strong><span>候诊、处方、发药、随访紧密衔接</span></div>
+                <div class="feature-card"><strong>管理更规范</strong><span>排班、库存、日志、报表统一管理</span></div>
+              </div>
+            </div>
+            <div class="login-card">
+              <div class="segmented">
+                <button class="active">居民登录</button>
+                <button>医护登录</button>
+                <button>管理员</button>
+              </div>
+              <label>手机号</label>
+              <div class="input" tabindex="0">138 0000 0001</div>
+              <label>登录密码</label>
+              <div class="input" tabindex="0">••••••••••</div>
+              <button class="primary wide">立即登录</button>
+              <div class="meta-row"><span>忘记密码</span><span>登录帮助</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="resident-home">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">居民端</span>
+            <h3>居民首页</h3>
+          </div>
+          <p>移动优先，采用欢迎卡、快捷服务和提醒摘要的组合，强化便民服务感。</p>
+        </div>
+        <div class="frame mobile">
+          <div class="phone-screen">
+            <div class="elder-toggle-bar">
+              <button class="elder-toggle-btn" id="elderToggleBtn" onclick="toggleElderMode()">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;">
+                  <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  <path d="M11 7l1.5 1.5M13 9l1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <span id="elderToggleLabel">敬老版</span>
+              </button>
+            </div>
+            <div class="mobile-top hero-green">
+              <span class="badge light">上午好，张建国</span>
+              <h4>今天有 2 条健康提醒</h4>
+              <p>复诊提醒 1 条，接种提醒 1 条</p>
+            </div>
+            <div class="section-card">
+              <div class="card-title-row"><strong>快捷服务</strong><span>全部服务</span></div>
+              <div class="shortcut-grid">
+                <div>预约挂号</div><div>健康档案</div><div>就诊记录</div>
+                <div>疫苗接种</div><div>健康摘要</div><div>消息通知</div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="card-title-row"><strong>我的预约</strong><span>查看全部</span></div>
+              <div class="list-card" style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <strong style="display:block;">全科门诊 · 李明华</strong>
+                  <span style="font-size:13px;color:#63756d;">2026-03-18 上午 · 就诊号 QKMZ-008</span>
+                </div>
+                <span class="status-tag pending">待就诊</span>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="card-title-row"><strong>消息通知</strong><span>2 未读</span></div>
+              <div class="message-line">您有一条复诊提醒，请在本周内完成复诊。</div>
+              <div class="message-line">流感疫苗第二针已开放预约。</div>
+            </div>
+            <div class="tabbar">
+              <span class="active">首页</span><span>预约</span><span>档案</span><span>消息</span><span>我的</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="appointment">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">居民端</span>
+            <h3>预约挂号</h3>
+          </div>
+          <p>保留流程感，但用更清晰的步骤导航和右侧预约摘要提升信任感。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="app-shell">
+            <div class="stepbar">
+              <div class="step-item completed">
+                <div class="step-dot"><span class="step-num">1</span></div>
+                <span class="step-label">选择科室</span>
+              </div>
+              <div class="step-item completed">
+                <div class="step-dot"><span class="step-num">2</span></div>
+                <span class="step-label">医生时段</span>
+              </div>
+              <div class="step-item active">
+                <div class="step-dot"><span class="step-num">3</span></div>
+                <span class="step-label">填写信息</span>
+              </div>
+              <div class="step-item">
+                <div class="step-dot"><span class="step-num">4</span></div>
+                <span class="step-label">完成预约</span>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="panel">
+                <h4>选择医生与时段</h4>
+                <div class="doctor-card">
+                  <div><strong>李明华 主任医师</strong><p>擅长高血压、糖尿病及慢病管理</p></div>
+                  <div class="tag good">可预约 8</div>
+                </div>
+                <div class="timeslots">
+                  <span class="slot selected" tabindex="0" role="button" aria-label="选择 03-18 上午 08:30 时段">03-18 上午 08:30</span>
+                  <span class="slot" tabindex="0" role="button" aria-label="选择 03-18 上午 09:10 时段">03-18 上午 09:10</span>
+                  <span class="slot" tabindex="0" role="button" aria-label="选择 03-18 上午 09:40 时段">03-18 上午 09:40</span>
+                  <span class="slot weak" tabindex="0" role="button" aria-label="03-18 下午已满">03-18 下午 已满</span>
+                </div>
+                <div class="doctor-card">
+                  <div><strong>王秀英 主治医师</strong><p>擅长呼吸系统常见病与老年患者管理</p></div>
+                  <div class="tag warn">可预约 2</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <h4>预约信息确认</h4>
+                <div class="summary-row"><span>预约科室</span><strong>全科门诊</strong></div>
+                <div class="summary-row"><span>接诊医生</span><strong>李明华</strong></div>
+                <div class="summary-row"><span>就诊时段</span><strong>03-18 上午 08:30</strong></div>
+                <div class="summary-row"><span>就诊人</span><strong>张建国</strong></div>
+                <button class="primary wide">下一步，填写信息</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="record">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">居民端</span>
+            <h3>健康档案</h3>
+          </div>
+          <p>从纯字段展示升级为“概览卡 + 指标卡 + 病史卡 + 导出摘要”。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="app-shell">
+            <div class="page-toolbar">
+              <div><h4>健康档案概览</h4><p>最近更新于 2026-03-12，由全科门诊维护</p></div>
+              <button class="primary">导出健康摘要 PDF</button>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card"><span>血型</span><strong>A 型</strong></div>
+              <div class="metric-card"><span>慢病标签</span><strong>高血压 / 糖尿病</strong></div>
+              <div class="metric-card"><span>过敏史</span><strong>青霉素过敏</strong></div>
+              <div class="metric-card"><span>BMI</span><strong>24.8</strong></div>
+            </div>
+            <div class="three-col">
+              <div class="panel">
+                <h4>生命体征</h4>
+                <div class="stat-line">
+                  <span>血压</span>
+                  <strong>
+                    <span class="indicator-val-warn bp-value">132 / 84</span>
+                    <span style="color:#5D6D7E;font-weight:400;font-size:12px;"> mmHg</span>
+                    <span class="indicator-badge warn">偏高</span>
+                  </strong>
+                </div>
+                <div class="stat-line">
+                  <span>空腹血糖</span>
+                  <strong>
+                    <span class="indicator-val-warn">6.8</span>
+                    <span style="color:#5D6D7E;font-weight:400;font-size:12px;"> mmol/L</span>
+                    <span class="indicator-badge warn">临界</span>
+                  </strong>
+                </div>
+                <div class="stat-line">
+                  <span>心率</span>
+                  <strong>
+                    <span class="indicator-val-normal">76</span>
+                    <span style="color:#5D6D7E;font-weight:400;font-size:12px;"> bpm</span>
+                    <span class="indicator-badge normal">正常</span>
+                  </strong>
+                </div>
+                <div class="stat-line">
+                  <span>BMI</span>
+                  <strong>
+                    <span>24.8</span>
+                    <span style="color:#5D6D7E;font-weight:400;font-size:12px;"> kg/m²</span>
+                    <span class="indicator-badge normal">正常</span>
+                  </strong>
+                </div>
+                <div style="margin-top:12px;padding:10px 12px;background:#FEF3E7;border-left:3px solid #E67E22;border-radius:0 6px 6px 0;font-size:12px;color:#BA6414;line-height:1.6;">
+                  血压和血糖均处于临界偏高状态，建议定期监测并坚持用药。
+                </div>
+              </div>
+              <div class="panel">
+                <h4>病史信息</h4>
+                <p>既往史：2015 年确诊高血压，2018 年确诊糖尿病。</p>
+                <p>家族史：父亲有冠心病病史。</p>
+              </div>
+              <div class="panel">
+                <h4>当前用药</h4>
+                <p>苯磺酸氨氯地平片</p>
+                <p>二甲双胍缓释片</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="visit">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">居民端</span>
+            <h3>就诊记录</h3>
+          </div>
+          <p>以时间轴和详情抽屉展示诊断、处方与检查结果，弱化“列表页”感觉。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="timeline-page">
+            <div class="timeline-list">
+              <div class="timeline-item active"><strong>2026-03-10 全科门诊</strong><span>主诉：头晕，血压偏高</span></div>
+              <div class="timeline-item"><strong>2026-01-18 全科门诊</strong><span>主诉：血糖波动复查</span></div>
+            </div>
+            <div class="detail-panel">
+              <h4>本次就诊详情</h4>
+              <div class="detail-section"><span>诊断结果</span><p>原发性高血压，建议继续控制饮食并规律服药。</p></div>
+              <div class="detail-section"><span>处方摘要</span><p>络活喜 1 盒，格华止 1 盒，已发药。</p></div>
+              <div class="detail-section"><span>医生建议</span><p>建议两周后复诊，持续记录晨起血压。</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="medical">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">医护端</span>
+            <h3>医护工作台</h3>
+          </div>
+          <p>用三栏工作台替代传统列表页，突出队列、当前患者、今日待办。</p>
+        </div>
+        <div class="frame desktop wide">
+          <div class="workspace">
+            <div class="metric-strip">
+              <div class="metric-card"><span>今日候诊</span><strong>18</strong></div>
+              <div class="metric-card"><span>接诊中</span><strong>2</strong></div>
+              <div class="metric-card"><span>待随访</span><strong>6</strong></div>
+              <div class="metric-card"><span>异常提醒</span><strong>3</strong></div>
+            </div>
+            <div class="workspace-grid">
+              <div class="panel">
+                <h4>候诊队列</h4>
+                <div class="panel-scroll-body">
+                  <div class="queue-row focus" tabindex="0" role="button" aria-label="叫号 A0231 张建国">
+                    <div>
+                      <strong>A0231</strong>
+                      <span style="color:#5D6D7E;margin-left:8px;">张建国</span>
+                      <div style="margin-top:4px;">
+                        <span class="chronic-tag hypertension">高血压</span>
+                        <span class="chronic-tag diabetes">糖尿病</span>
+                      </div>
+                    </div>
+                    <span class="status-tag in-progress">接诊中</span>
+                  </div>
+                  <div class="queue-row" tabindex="0" role="button" aria-label="叫号 A0232 李秀兰">
+                    <div>
+                      <strong>A0232</strong>
+                      <span style="color:#5D6D7E;margin-left:8px;">李秀兰</span>
+                    </div>
+                    <span class="status-tag pending">待就诊</span>
+                  </div>
+                  <div class="queue-row" tabindex="0" role="button" aria-label="叫号 A0233 王志强">
+                    <div>
+                      <strong>A0233</strong>
+                      <span style="color:#5D6D7E;margin-left:8px;">王志强</span>
+                    </div>
+                    <span class="status-tag pending">待就诊</span>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <h4>当前接诊患者</h4>
+                <div class="panel-scroll-body">
+                  <div class="patient-card"><strong>张建国 · 男 · 60 岁</strong><span>高血压 / 糖尿病 / 青霉素过敏</span></div>
+                  <div class="alert-bar alert-danger" style="margin:10px 0 0;">
+                    <span class="alert-icon">!</span>
+                    <span><strong>过敏史警告：</strong>该患者对青霉素过敏，开药前请仔细核查。</span>
+                  </div>
+                  <div class="alert-bar alert-info" style="margin:6px 0 12px;">
+                    <span class="alert-icon">i</span>
+                    <span>已纳入高血压慢病管理，下次随访：<strong>2026-04-10</strong>，距今 26 天。</span>
+                  </div>
+                  <div class="input-area tall">主诉：近三天晨起头晕，血压波动明显</div>
+                  <div class="input-area">诊断：原发性高血压，血压控制不稳定</div>
+                  <div class="input-area">治疗方案：调整用药，建议两周后复诊</div>
+                </div>
+              </div>
+              <div class="panel">
+                <h4>今日待办</h4>
+                <div class="panel-scroll-body">
+                  <div class="todo-line">待开方处方 4 项</div>
+                  <div class="todo-line">待发药核对 3 项</div>
+                  <div class="todo-line">到期随访 2 项</div>
+                  <button class="primary wide">完成接诊</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="prescription">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">医护端</span>
+            <h3>电子处方</h3>
+          </div>
+          <p>处方页按临床工作区设计，左患者、中王方、右预览。</p>
+        </div>
+        <div class="frame desktop wide">
+          <div class="workspace-grid">
+            <div class="panel narrow">
+              <h4>患者信息</h4>
+              <div class="patient-card"><strong>张建国</strong><span>男 / 60 岁 / 就诊号 V20260315001</span></div>
+              <div class="note-card">注意：青霉素过敏，慢病患者，建议谨慎用药。</div>
+            </div>
+            <div class="panel">
+              <h4>处方明细</h4>
+              <div class="table-mock">
+                <div class="row head"><span>药品</span><span>数量</span><span>用法</span><span>频次</span></div>
+                <div class="row"><span>苯磺酸氨氯地平片</span><span>1 盒</span><span>口服</span><span>qd</span></div>
+                <div class="row"><span>二甲双胍缓释片</span><span>1 盒</span><span>口服</span><span>bid</span></div>
+              </div>
+              <button class="ghost">+ 添加药品</button>
+            </div>
+            <div class="panel">
+              <h4>处方预览</h4>
+              <div class="summary-row"><span>处方号</span><strong>RX20260315001</strong></div>
+              <div class="summary-row"><span>开方医生</span><strong>李明华</strong></div>
+              <div class="summary-row"><span>处方状态</span><strong><span class="status-tag dispensing">待发药</span></strong></div>
+              <button class="primary wide">提交处方</button>
+              <button class="secondary wide" onclick="window.print()">打印处方</button>
+              <div class="print-only">
+                <div style="margin-top:16pt;padding-top:8pt;border-top:1pt solid #000;font-size:10pt;color:#333;">
+                  <div>机构名称：XX 社区卫生服务中心</div>
+                  <div>打印时间：<span id="print-time"></span></div>
+                  <div style="margin-top:8pt;font-size:9pt;color:#666;">
+                    患者签名：_______________　　医师签名：_______________
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="pharmacy">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">医护端</span>
+            <h3>药房发药</h3>
+          </div>
+          <p>独立出“护士校对发药”环节，真正形成处方闭环。</p>
+        </div>
+        <div class="frame desktop wide">
+          <div class="workspace">
+            <div class="metric-strip">
+              <div class="metric-card"><span>待发药处方</span><strong>6</strong></div>
+              <div class="metric-card"><span>库存异常</span><strong>1</strong></div>
+              <div class="metric-card"><span>已发药</span><strong>12</strong></div>
+              <div class="metric-card"><span>待复核</span><strong>2</strong></div>
+            </div>
+            <div class="workspace-grid">
+              <div class="panel narrow">
+                <h4>待发药处方</h4>
+                <div class="panel-scroll-body">
+                  <div class="queue-row focus" tabindex="0" role="button" aria-label="发药处方 RX20260315001 张建国">
+                    <div>
+                      <strong>RX20260315001</strong>
+                      <span style="color:#5D6D7E;margin-left:8px;">张建国</span>
+                    </div>
+                    <span class="status-tag dispensing">待校对</span>
+                  </div>
+                  <div class="queue-row" tabindex="0" role="button" aria-label="发药处方 RX20260315002 李秀兰">
+                    <div>
+                      <strong>RX20260315002</strong>
+                      <span style="color:#5D6D7E;margin-left:8px;">李秀兰</span>
+                    </div>
+                    <span class="status-tag dispensing">待校对</span>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <h4>处方与库存批次</h4>
+                <div class="panel-scroll-body">
+                  <div class="table-mock">
+                    <div class="row head"><span>药品</span><span>库存批次</span><span>剩余数量</span></div>
+                    <div class="row"><span>络活喜 5mg×28片</span><span>20250101-A</span><span>120</span></div>
+                    <div class="row"><span>格华止 500mg×30片</span><span>20250201-A</span><span>80</span></div>
+                    <div class="row"><span>阿托伐他汀钙片</span><span>20241210-C</span><span>45</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <h4>发药校对</h4>
+                <div class="panel-scroll-body">
+                  <div class="stat-line"><span>患者</span><strong>张建国</strong></div>
+                  <div class="stat-line"><span>处方号</span><strong>RX20260315001</strong></div>
+                  <div class="stat-line"><span>校对状态</span><strong><span class="status-tag dispensed">已核对批次</span></strong></div>
+                  <button class="primary wide">确认发药</button>
+                  <button class="secondary wide">库存不足登记</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="followup">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">医护端</span>
+            <h3>随访与公卫</h3>
+          </div>
+          <p>把随访和公卫做成统一工作区，但视觉上分为两个业务标签页。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="app-shell">
+            <div class="segmented wide-tabs"><button class="active">慢病随访</button><button>公卫服务</button></div>
+            <div class="two-col">
+              <div class="panel">
+                <h4>随访计划</h4>
+                <div class="queue-row">
+                  <div><strong>张建国</strong><span style="margin-left:8px;color:#5D6D7E;">高血压</span></div>
+                  <span class="status-tag follow-upcoming">2 天后到期</span>
+                </div>
+                <div class="queue-row">
+                  <div><strong>李秀兰</strong><span style="margin-left:8px;color:#5D6D7E;">糖尿病</span></div>
+                  <span class="status-tag follow-normal">今日随访</span>
+                </div>
+              </div>
+              <div class="panel">
+                <h4>趋势与记录</h4>
+                <div id="chart-followup-trend" style="height:180px;width:100%;"></div>
+                <div class="message-line">最近随访：血压较前次下降，建议继续控制饮食。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="admin">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">管理员端</span>
+            <h3>管理驾驶舱</h3>
+          </div>
+          <p>从“后台首页”升级为“运营驾驶舱”，更适合汇报和展示课题成果。</p>
+        </div>
+        <div class="frame desktop wide admin-tone">
+          <div class="workspace">
+            <div class="metric-strip" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;">
+              <div class="metric-card-v2 mc-primary">
+                <div class="mc-label">今日预约</div>
+                <div class="mc-value">36</div>
+                <div class="mc-trend mc-trend-up">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 9L6 3L10 9" stroke="#27AE60" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  较昨日 +4
+                </div>
+              </div>
+              <div class="metric-card-v2 mc-success">
+                <div class="mc-label">今日就诊</div>
+                <div class="mc-value">29</div>
+                <div class="mc-trend" style="color:#5D6D7E;">预约转化率 80.6%</div>
+              </div>
+              <div class="metric-card-v2 mc-warn">
+                <div class="mc-label">药品预警</div>
+                <div class="mc-value">4</div>
+                <div class="mc-trend" style="color:#E67E22;">低库存 2 · 临期 2</div>
+              </div>
+              <div class="metric-card-v2 mc-danger">
+                <div class="mc-label">疫苗预警</div>
+                <div class="mc-value">2</div>
+                <div class="mc-trend mc-trend-down">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 3L6 9L10 3" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  较上周 +1 项
+                </div>
+              </div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="panel">
+                <h4>近 7 天预约趋势</h4>
+                <div id="chart-appt-trend" style="height:180px;width:100%;"></div>
+              </div>
+              <div class="panel">
+                <h4>科室负载分布</h4>
+                <div id="chart-dept-dist" style="height:180px;width:100%;"></div>
+              </div>
+              <div class="panel">
+                <h4>药品消耗 TOP5</h4>
+                <div id="chart-drug-top5" style="height:180px;width:100%;"></div>
+              </div>
+              <div class="panel">
+                <h4>近期公告与风险提醒</h4>
+                <div class="alert-bar alert-danger">
+                  <span class="alert-icon">!</span>
+                  <div>
+                    <strong>库存临期批次 3 项</strong>
+                    <div style="margin-top:2px;">苯磺酸氨氯地平片等 3 个批次将在 30 天内到期，请尽快处理。</div>
+                  </div>
+                  <button class="alert-close" onclick="this.closest('.alert-bar').remove()">×</button>
+                </div>
+                <div class="alert-bar alert-warn">
+                  <span class="alert-icon">⚠</span>
+                  <div>
+                    <strong>调班审批待处理 2 项</strong>
+                    <div style="margin-top:2px;">李明华医生申请 2026-03-20 调班，已等待 2 天。</div>
+                  </div>
+                  <button class="alert-close" onclick="this.closest('.alert-bar').remove()">×</button>
+                </div>
+                <div class="alert-bar alert-info">
+                  <span class="alert-icon">i</span>
+                  <div>
+                    <strong>系统公告 1 条待发布</strong>
+                    <div style="margin-top:2px;">清明节出诊安排通知草稿已保存，待审核发布。</div>
+                  </div>
+                  <button class="alert-close" onclick="this.closest('.alert-bar').remove()">×</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="schedule">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">管理员端</span>
+            <h3>排班与号源管理</h3>
+          </div>
+          <p>支持周视图、停诊、调班审批和号源配置的完整视图。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="app-shell">
+            <div class="page-toolbar">
+              <div><h4>排班总览</h4><p>支持按科室、医生、日期范围查看和配置</p></div>
+              <div class="toolbar-actions"><button class="secondary">导出排班表</button><button class="primary">新增排班</button></div>
+            </div>
+            <div class="filter-row"><span>科室：全科门诊</span><span>日期：03-17 至 03-23</span><span>状态：全部</span></div>
+            <div class="table-mock">
+              <div class="row head"><span>医生</span><span>日期</span><span>上午号源</span><span>下午号源</span><span>状态</span></div>
+              <div class="row"><span>李明华</span><span>03-18</span><span>20</span><span>15</span><span><span class="status-tag done">正常</span></span></div>
+              <div class="row"><span>王秀英</span><span>03-18</span><span>15</span><span>10</span><span><span class="status-tag cancelled">停诊</span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="prototype-block" id="inventory">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">管理员端</span>
+            <h3>药品与疫苗库存</h3>
+          </div>
+          <p>把库存做成独立的经营模块，包含药品、疫苗、日志和预警中心。</p>
+        </div>
+        <div class="frame desktop">
+          <div class="app-shell admin-tone">
+            <div class="segmented wide-tabs">
+              <button class="active">药品库存</button><button>疫苗库存</button><button>出入库记录</button><button>预警中心</button>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card"><span>低库存药品</span><strong>4</strong></div>
+              <div class="metric-card"><span>临期药品</span><strong>3</strong></div>
+              <div class="metric-card"><span>低库存疫苗</span><strong>2</strong></div>
+              <div class="metric-card"><span>临期疫苗</span><strong>1</strong></div>
+            </div>
+            <div class="table-mock">
+              <div class="row head"><span>名称</span><span>批次</span><span>库存</span><span>效期</span><span>状态</span></div>
+              <div class="row"><span>苯磺酸氨氯地平片</span><span>20250101-A</span><span>120</span><span>2027-01-01</span><span><span class="status-tag done">正常</span></span></div>
+              <div class="row"><span>流感疫苗（四价）</span><span>FLU-2025A</span><span>18</span><span>2026-06-30</span><span><span class="status-tag follow-upcoming">预警</span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function toggleElderMode() {
+      const body = document.body;
+      const label = document.getElementById('elderToggleLabel');
+      if (body.classList.contains('elder-mode')) {
+        body.classList.remove('elder-mode');
+        label.textContent = '敬老版';
+        localStorage.setItem('elderMode', 'off');
+      } else {
+        body.classList.add('elder-mode');
+        label.textContent = '标准版';
+        localStorage.setItem('elderMode', 'on');
+      }
+    }
+
+    (function restoreElderMode() {
+      if (localStorage.getItem('elderMode') === 'on') {
+        document.body.classList.add('elder-mode');
+        const label = document.getElementById('elderToggleLabel');
+        if (label) label.textContent = '标准版';
+      }
+    })();
+
+    var PRIMARY = '#2F6B57';
+    var MEDICAL = '#4D6F99';
+    var WARN = '#E67E22';
+    var LABEL_CLR = '#63756D';
+    var GRID_LINE = '#EEF2EF';
+
+    var gridBase = { top: 12, right: 12, bottom: 28, left: 36 };
+    var axisBase = function() {
+      return {
+        axisLine: { lineStyle: { color: '#E4E7ED' } },
+        axisTick: { show: false },
+        axisLabel: { color: LABEL_CLR, fontSize: 11 },
+        splitLine: { lineStyle: { color: GRID_LINE } }
+      };
+    };
+
+    (function initAppointmentTrend() {
+      var el = document.getElementById('chart-appt-trend');
+      if (!el || typeof echarts === 'undefined') return;
+      var chart = echarts.init(el);
+      chart.setOption({
+        grid: gridBase,
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: '#fff',
+          borderColor: '#E4E7ED',
+          textStyle: { color: '#23312D', fontSize: 12 }
+        },
+        xAxis: Object.assign({ type: 'category', data: ['03-09', '03-10', '03-11', '03-12', '03-13', '03-14', '03-15'] }, axisBase()),
+        yAxis: Object.assign({ type: 'value', min: 0, max: 50 }, axisBase()),
+        series: [{
+          data: [28, 32, 25, 36, 29, 41, 36],
+          type: 'line',
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 5,
+          lineStyle: { color: PRIMARY, width: 2.5 },
+          itemStyle: { color: PRIMARY },
+          areaStyle: { color: 'rgba(47,107,87,0.08)' }
+        }]
+      });
+    })();
+
+    (function initDeptDist() {
+      var el = document.getElementById('chart-dept-dist');
+      if (!el || typeof echarts === 'undefined') return;
+      var chart = echarts.init(el);
+      chart.setOption({
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} 人 ({d}%)',
+          backgroundColor: '#fff',
+          borderColor: '#E4E7ED',
+          textStyle: { color: '#23312D', fontSize: 12 }
+        },
+        legend: {
+          bottom: 0,
+          textStyle: { color: LABEL_CLR, fontSize: 11 },
+          itemGap: 16
+        },
+        series: [{
+          type: 'pie',
+          radius: ['42%', '68%'],
+          center: ['50%', '44%'],
+          label: { show: false },
+          data: [
+            { value: 29, name: '全科门诊', itemStyle: { color: PRIMARY } },
+            { value: 11, name: '口腔科', itemStyle: { color: MEDICAL } },
+            { value: 8, name: '妇幼保健', itemStyle: { color: '#7D3C98' } }
+          ]
+        }]
+      });
+    })();
+
+    (function initDrugTop5() {
+      var el = document.getElementById('chart-drug-top5');
+      if (!el || typeof echarts === 'undefined') return;
+      var chart = echarts.init(el);
+      chart.setOption({
+        grid: { top: 4, right: 20, bottom: 4, left: 120 },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          backgroundColor: '#fff',
+          borderColor: '#E4E7ED',
+          textStyle: { color: '#23312D', fontSize: 12 }
+        },
+        xAxis: {
+          type: 'value',
+          axisLabel: { color: LABEL_CLR, fontSize: 11 },
+          splitLine: { lineStyle: { color: GRID_LINE } },
+          axisLine: { show: false }
+        },
+        yAxis: {
+          type: 'category',
+          data: ['二甲双胍缓释片', '格华止', '苯磺酸氨氯地平片', '络活喜', '阿托伐他汀钙片'],
+          axisLabel: { color: LABEL_CLR, fontSize: 11 },
+          axisLine: { show: false },
+          axisTick: { show: false }
+        },
+        series: [{
+          type: 'bar',
+          data: [38, 35, 32, 28, 21],
+          barMaxWidth: 14,
+          itemStyle: { color: PRIMARY, borderRadius: [0, 4, 4, 0] }
+        }]
+      });
+    })();
+
+    (function initFollowupTrend() {
+      var el = document.getElementById('chart-followup-trend');
+      if (!el || typeof echarts === 'undefined') return;
+      var chart = echarts.init(el);
+      chart.setOption({
+        grid: gridBase,
+        legend: { top: 0, right: 0, textStyle: { color: LABEL_CLR, fontSize: 11 } },
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: '#fff',
+          borderColor: '#E4E7ED',
+          textStyle: { color: '#23312D', fontSize: 12 }
+        },
+        xAxis: Object.assign({ type: 'category', data: ['01-10', '01-25', '02-15', '03-01', '03-15'] }, axisBase()),
+        yAxis: Object.assign({ type: 'value', min: 70, max: 180, name: 'mmHg', nameTextStyle: { color: LABEL_CLR, fontSize: 10 } }, axisBase()),
+        series: [
+          {
+            name: '收缩压',
+            data: [148, 145, 140, 135, 132],
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 5,
+            lineStyle: { color: WARN, width: 2 },
+            itemStyle: { color: WARN }
+          },
+          {
+            name: '舒张压',
+            data: [92, 90, 88, 87, 84],
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 5,
+            lineStyle: { color: MEDICAL, width: 2 },
+            itemStyle: { color: MEDICAL }
+          }
+        ]
+      });
+    })();
+
+    window.addEventListener('resize', function() {
+      ['chart-appt-trend', 'chart-dept-dist', 'chart-drug-top5', 'chart-followup-trend'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+          var instance = echarts.getInstanceByDom(el);
+          if (instance) instance.resize();
+        }
+      });
+    });
+
+    window.addEventListener('beforeprint', function() {
+      var el = document.getElementById('print-time');
+      if (el) el.textContent = new Date().toLocaleString('zh-CN');
+      document.querySelectorAll('.print-only').forEach(function(node) {
+        node.style.display = 'block';
+      });
+    });
+
+    window.addEventListener('afterprint', function() {
+      document.querySelectorAll('.print-only').forEach(function(node) {
+        node.style.display = 'none';
+      });
+    });
+  </script>
+</body>
+</html>

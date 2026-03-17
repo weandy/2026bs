@@ -1,0 +1,673 @@
+/* ============================================================
+   全局组件样式 — 不可 scoped
+   status-tag / chronic-tag / indicator / alert-bar / metric-card-v2
+   ============================================================ */
+
+/* ══════════════════════════════════
+   状态标签 .status-tag
+   ══════════════════════════════════ */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-tag.pending    { background: var(--bg-info); color: var(--text-info); }
+.status-tag.pending::before     { background: var(--info); }
+.status-tag.in-progress { background: var(--bg-warning); color: var(--text-warning); }
+.status-tag.in-progress::before { background: var(--warn); }
+.status-tag.done       { background: var(--bg-success); color: var(--text-success); }
+.status-tag.done::before        { background: var(--good); }
+.status-tag.cancelled  { background: var(--surface-soft); color: var(--neutral-400); }
+.status-tag.cancelled::before   { background: var(--neutral-300); }
+.status-tag.absent     { background: var(--bg-danger); color: var(--text-danger); }
+.status-tag.absent::before      { background: var(--danger); }
+.status-tag.dispensing { background: var(--bg-info); color: var(--text-info); }
+.status-tag.dispensing::before  { background: var(--info); }
+.status-tag.dispensed  { background: var(--bg-success); color: var(--text-success); }
+.status-tag.dispensed::before   { background: var(--good); }
+.status-tag.follow-normal   { background: var(--bg-success); color: var(--text-success); }
+.status-tag.follow-normal::before { background: var(--good); }
+.status-tag.follow-upcoming { background: var(--bg-warning); color: var(--text-warning); }
+.status-tag.follow-upcoming::before { background: var(--warn); }
+.status-tag.follow-lost { background: var(--bg-danger); color: var(--text-danger); }
+.status-tag.follow-lost::before { background: var(--danger); }
+
+/* ══════════════════════════════════
+   慢病标签 .chronic-tag
+   ══════════════════════════════════ */
+.chronic-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+  border-left: 3px solid;
+}
+
+.chronic-tag.hypertension { background: var(--bg-info); color: var(--text-info); border-left-color: var(--info); }
+.chronic-tag.diabetes     { background: var(--bg-warning); color: var(--text-warning); border-left-color: var(--warn); }
+.chronic-tag.chd          { background: var(--bg-danger); color: var(--text-danger); border-left-color: var(--danger); }
+.chronic-tag.copd         { background: rgba(124, 92, 191, 0.15); color: var(--accent-purple); border-left-color: var(--accent-purple); }
+.chronic-tag.stroke       { background: var(--bg-success); color: var(--text-success); border-left-color: var(--good); }
+
+/* ══════════════════════════════════
+   健康指标徽章 .indicator-badge / .indicator-val-*
+   ══════════════════════════════════ */
+.indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.indicator-badge.normal  { background: var(--bg-success); color: var(--text-success); }
+.indicator-badge.warn    { background: var(--bg-warning); color: var(--text-warning); }
+.indicator-badge.danger  { background: var(--bg-danger); color: var(--text-danger); }
+
+.indicator-val-normal { color: var(--good); font-weight: 600; }
+.indicator-val-warn   { color: var(--warn); font-weight: 600; }
+.indicator-val-danger { color: var(--danger); font-weight: 600; }
+
+/* ══════════════════════════════════
+   告警条 .alert-bar
+   ══════════════════════════════════ */
+.alert-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-left: 3px solid;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.alert-bar .alert-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alert-bar .alert-close {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  align-self: flex-start;
+  transition: opacity 0.2s;
+}
+.alert-bar .alert-close:hover { opacity: 1; }
+
+.alert-bar.alert-success { background: var(--bg-success); border-left-color: var(--good); color: var(--text-success); }
+.alert-bar.alert-warn    { background: var(--bg-warning); border-left-color: var(--warn); color: var(--text-warning); }
+.alert-bar.alert-danger  { background: var(--bg-danger); border-left-color: var(--danger); color: var(--text-danger); }
+.alert-bar.alert-info    { background: var(--bg-info); border-left-color: var(--info); color: var(--text-info); }
+
+/* ══════════════════════════════════
+   指标卡 v2 .metric-card-v2
+   ══════════════════════════════════ */
+.metric-card-v2 {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: box-shadow 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.metric-card-v2:hover { box-shadow: var(--shadow-sm); }
+
+.metric-card-v2 .mc-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.metric-card-v2 .mc-value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-card-v2.mc-primary { border-left-color: var(--info); }
+.metric-card-v2.mc-success { border-left-color: var(--good); }
+.metric-card-v2.mc-warn    { border-left-color: var(--warn); }
+.metric-card-v2.mc-danger  { border-left-color: var(--danger); }
+.metric-card-v2.mc-info    { border-left-color: var(--primary); }
+
+.metric-card-v2.mc-primary .mc-value { color: var(--info); }
+.metric-card-v2.mc-success .mc-value { color: var(--good); }
+.metric-card-v2.mc-warn    .mc-value { color: var(--warn); }
+.metric-card-v2.mc-danger  .mc-value { color: var(--danger); }
+.metric-card-v2.mc-info    .mc-value { color: var(--primary); }
+
+.metric-card-v2 .mc-trend {
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.mc-trend-up   { color: var(--good) !important; }
+.mc-trend-down { color: var(--danger) !important; }
+.mc-trend-flat { color: var(--neutral-400) !important; }
+
+/* ══════════════════════════════════
+   Panel 通用卡片
+   ══════════════════════════════════ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.panel h4 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ══════════════════════════════════
+   工作台列表行 .queue-row
+   ══════════════════════════════════ */
+.queue-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.queue-row:hover {
+  background: var(--primary-light);
+}
+
+.queue-row.focus {
+  background: rgba(77, 111, 153, 0.15);
+  border: 1px solid var(--medical);
+}
+
+.queue-row > div { flex: 1; min-width: 0; }
+
+/* ══════════════════════════════════
+   时段选择 .slot
+   ══════════════════════════════════ */
+.slot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.slot-btn:hover { background: var(--primary-light-hover); color: var(--primary-strong); }
+.slot-btn.selected { background: var(--primary-light-hover); color: var(--primary-strong); font-weight: 600; }
+.slot-btn.full { background: var(--bg-danger); color: var(--danger); cursor: not-allowed; }
+
+/* ══════════════════════════════════
+   Segmented Tabs
+   ══════════════════════════════════ */
+.segmented-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  margin-bottom: 18px;
+}
+
+.segmented-tabs button {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+}
+
+.segmented-tabs button.active {
+  background: var(--surface);
+  color: var(--primary-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.segmented-tabs button:hover:not(.active) {
+  color: var(--primary-strong);
+}
+
+/* ══════════════════════════════════
+   步骤条 .stepbar
+   ══════════════════════════════════ */
+.stepbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  position: relative;
+}
+
+.step-item::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border-strong);
+  z-index: 0;
+}
+.step-item:last-child::after { display: none; }
+.step-item.completed::after  { background: var(--good); }
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 1;
+  position: relative;
+  transition: all 0.2s ease;
+  background: var(--surface-soft);
+  color: var(--neutral-400);
+  border: 1.5px solid var(--border-strong);
+}
+
+.step-item.completed .step-dot {
+  background: var(--good);
+  color: #fff;
+  border-color: var(--good);
+}
+
+.step-item.active .step-dot {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.step-label {
+  font-size: 11px;
+  color: var(--neutral-400);
+  white-space: nowrap;
+}
+.step-item.completed .step-label { color: var(--good); }
+.step-item.active    .step-label { color: var(--primary); font-weight: 600; }
+
+/* ══════════════════════════════════
+   调/列滚动区 .panel-scroll-body
+   ══════════════════════════════════ */
+.panel-scroll-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #d9e1db transparent;
+}
+.panel-scroll-body::-webkit-scrollbar { width: 4px; }
+.panel-scroll-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+/* ══════════════════════════════════
+   三栏工作台
+   ══════════════════════════════════ */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.4fr 0.9fr;
+  gap: 14px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.workspace-grid .panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 100%;
+}
+
+/* ══════════════════════════════════
+   等宽数字强制
+   ══════════════════════════════════ */
+.tabular,
+.mc-value,
+.indicator-val-normal,
+.indicator-val-warn,
+.indicator-val-danger,
+.queue-row strong,
+.slot-btn {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ══════════════════════════════════
+   通用页面结构复用类
+   ══════════════════════════════════ */
+
+/* 页面头部 —— 标题 + 操作按钮 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.page-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.page-header-main h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.page-header-main p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 概览摘要网格 —— 用于仪表盘的指标卡行 */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* 通用行 —— 列表中的每一项 */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  gap: 12px;
+}
+.list-row:last-child { border-bottom: none; }
+
+/* 操作按钮堆叠组（纵向或横向） */
+.action-stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.action-stack.vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* "查看更多" 链接 */
+.more-link {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: var(--primary);
+  text-decoration: none;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.more-link:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+/* ─────────────────────────────────────────────
+   去私有化提升类
+   summary-kv / receipt-row / stat-line
+   ───────────────────────────────────────────── */
+
+/* KV 摘要行（处方确认、预约摘要等场景） */
+.summary-kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--border);
+  font-size: 14px;
+}
+.summary-kv:last-child { border-bottom: none; }
+.summary-kv .sk-label { color: var(--muted); }
+.summary-kv .sk-val   { color: var(--text-strong); font-weight: 600; }
+.summary-kv .sk-highlight { color: var(--primary); }
+
+/* 回执/票据行（Step4 预约回执、处方单据等场景） */
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.receipt-row:last-child { border-bottom: none; }
+.receipt-row span   { color: var(--muted); }
+.receipt-row strong  { color: var(--text-strong); font-weight: 600; }
+
+/* 体征指标行（健康档案生命体征等场景） */
+.stat-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px dotted var(--border);
+}
+.stat-line:last-of-type { border-bottom: none; }
+.stat-line .stat-label { font-size: 14px; color: var(--text); }
+.stat-line .stat-val-group { display: flex; align-items: baseline; gap: 6px; }
+.stat-line .stat-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-line .stat-unit { font-size: 12px; color: var(--muted); }
+
+/* ─────────────────────────────────────────────
+   分段选项卡 segmented-tabs
+   ───────────────────────────────────────────── */
+.segmented-tabs {
+  display: flex;
+  background: var(--surface-soft);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.segmented-tabs button {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.segmented-tabs button:hover { color: var(--text); }
+.segmented-tabs button.active {
+  background: var(--surface);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ─────────────────────────────────────────────
+   管理端表格 & 表单 公共类
+   ───────────────────────────────────────────── */
+.custom-table { border-radius: 8px; overflow: hidden; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: 0.5px; }
+.drug-name { font-size: 15px; color: var(--text-strong); }
+.muted-text { font-size: 13px; color: var(--muted); }
+.time-text { font-size: 13px; color: var(--muted); }
+.action-divider { color: var(--border); margin: 0 6px; font-size: 12px; }
+
+/* 库存指示 */
+.stock-cell { display: flex; align-items: baseline; justify-content: center; }
+.stock-qty { font-weight: 700; font-size: 16px; }
+.stock-danger { color: var(--text-warning); font-weight: 700; }
+.stock-warning { color: #e67e22; font-weight: 700; }
+.stock-safe { color: var(--text-strong); }
+.text-danger { color: var(--text-warning) !important; font-weight: 600; }
+.success-text { color: var(--primary); }
+.danger-text { color: var(--text-warning); }
+
+/* 弹框 & 表单 */
+.dialog-content { padding: 10px 0; }
+.form-row { display: flex; gap: 16px; align-items: flex-end; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.section-divider {
+  display: flex; align-items: center; text-align: center;
+  margin: 12px 0 16px; color: var(--text-strong); font-weight: 600; font-size: 14px;
+}
+.section-divider::before, .section-divider::after { content: ''; flex: 1; border-bottom: 1px dashed var(--border); }
+.section-divider::before { margin-right: 12px; }
+.section-divider::after { margin-left: 12px; }
+.value-display {
+  padding: 8px 12px; background: var(--surface-soft);
+  border-radius: 6px; border: 1px solid var(--border); font-weight: 600; color: var(--primary);
+}
+
+/* 抽屉 */
+.drawer-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; }
+.drawer-table { border-radius: 8px; overflow: hidden; }
+
+/* 过滤搜索条 */
+.filter-section { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.compact-form { display: flex; align-items: flex-end; gap: 12px; }
+
+/* ═══════════════════════════════════════════════════
+   响应式断点适配（≤ 768px 平板/手机横屏）
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* 页面头部 */
+  .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .page-header h2 { font-size: 20px; }
+  .page-subtitle { font-size: 13px; }
+
+  /* 过滤搜索区 */
+  .filter-section { padding-bottom: 12px; margin-bottom: 12px; }
+  .compact-form { flex-wrap: wrap; gap: 8px; }
+  .compact-form > * { min-width: 0; }
+
+  /* 指标卡 */
+  .metric-card-v2 { padding: 10px 12px; }
+  .metric-card-v2 .mc-value { font-size: 20px; }
+
+  /* 面板 */
+  .panel { padding: 12px; border-radius: 10px; }
+
+  /* 表单排版 */
+  .form-row { flex-direction: column; gap: 0; }
+  .form-row-3 { grid-template-columns: 1fr; gap: 0; }
+  .dialog-content { padding: 8px 0; }
+
+  /* 段分割线 */
+  .section-divider { margin: 8px 0 12px; font-size: 13px; }
+
+  /* 抽屉 */
+  .drawer-meta { flex-direction: column; align-items: flex-start; gap: 4px; }
+
+  /* 分段选项卡 */
+  .segmented-tabs { flex-wrap: nowrap; overflow-x: auto; }
+  .segmented-tabs button { white-space: nowrap; flex-shrink: 0; font-size: 13px; padding: 8px 14px; }
+
+  /* 库存指示 */
+  .stock-qty { font-size: 14px; }
+
+  /* 表格 */
+  .custom-table { font-size: 13px; }
+
+  /* 操作分隔符 */
+  .action-divider { margin: 0 4px; }
+
+  /* alert-bar */
+  .alert-bar { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 14px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   超小屏（≤ 480px 手机竖屏）
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .compact-form { flex-direction: column; }
+  .compact-form .el-input,
+  .compact-form .el-select { width: 100% !important; }
+  .compact-form .el-button { width: 100%; }
+
+  .metric-card-v2 .mc-value { font-size: 18px; }
+  .metric-card-v2 .mc-label { font-size: 11px; }
+
+  .panel h4 { font-size: 13px; }
+
+  .stat-line .stat-val { font-size: 16px; }
+  .stat-line .stat-unit { font-size: 11px; }
+}

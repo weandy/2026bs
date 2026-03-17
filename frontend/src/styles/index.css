@@ -1,0 +1,21 @@
+/* ========================
+   全局样式入口
+   顺序：token → components → global
+   不可调换顺序
+   ======================== */
+@import './design-tokens.css';
+@import './components.css';
+@import './global.css';
+
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  overflow-x: hidden;  /* 防止移动端横向溢出导致 fixed 定位失效 */
+  max-width: 100vw;
+}

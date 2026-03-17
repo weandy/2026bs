@@ -1,0 +1,30 @@
+--- AUTH ---
+  PASS admin_login
+  PASS doctor_login
+  PASS resident_login
+  PASS wrong_password (expected 401)
+
+--- ADMIN ---
+  PASS staff_list (8 records)
+  PASS sys_config (12 items)
+  PASS notice_list (16 records)
+  PASS audit_log (0 records)
+  PASS schedule_list (16 records)
+  PASS drug_list (13 records)
+
+--- RESIDENT ---
+  PASS health_record
+  PASS my_appointments (0 records)
+  PASS visit_records (0 records)
+  PASS vaccine_appts (0 records)
+  PASS vaccine_records (0 items)
+  PASS messages (0 records)
+  PASS unread_count
+
+--- MEDICAL ---
+  PASS today_queue (0 items)
+  PASS followup_plans (0 records)
+  PASS followup_today (0 items)
+  PASS public_health (0 records)
+
+=== RESULT: 21 passed, 0 failed ===

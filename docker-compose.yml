@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  chp-mysql:
+    image: mysql:8.0
+    container_name: chp-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: chp_admin
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./sql/seed_data.sql:/docker-entrypoint-initdb.d/2-seed_data.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  chp-redis:
+    image: redis:7.0-alpine
+    container_name: chp-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  chp-backend:
+    build:
+      context: ./backend
+    container_name: chp-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_DATASOURCE_URL=jdbc:mysql://chp-mysql:3306/chp_admin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=chp-redis
+    depends_on:
+      - chp-mysql
+      - chp-redis
+
+  chp-frontend:
+    build:
+      context: ./frontend
+    container_name: chp-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - chp-backend
+
+volumes:
+  mysql-data:

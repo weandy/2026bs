@@ -1,0 +1,199 @@
+/* ============================================================
+   global.css — 必须全局，不能 scoped
+   1. 敬老版 body.elder-mode（跨组件状态）
+   2. PC 紧凑模式 @media (min-width: 1024px)
+   3. 无障碍 focus-visible
+   4. @media print 打印样式
+   ============================================================ */
+
+/* ══════════════════════════════════
+   1. 敬老版 — 由 uiStore.elderMode 控制 body.elder-mode
+   ══════════════════════════════════ */
+body.elder-mode {
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+body.elder-mode .resident-hero h4 { font-size: 28px; }
+body.elder-mode .resident-hero p  { font-size: 16px; }
+body.elder-mode .shortcut-item    { font-size: 17px; padding: 20px 12px; font-weight: 600; }
+body.elder-mode .shortcut-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+body.elder-mode .bottom-tabbar .tab-label { font-size: 13px; }
+body.elder-mode .bottom-tabbar .tab-icon { width: 26px; height: 26px; flex-shrink: 0; }
+body.elder-mode .el-button { height: 48px; font-size: 16px; border-radius: 14px; }
+body.elder-mode .slot-btn  { font-size: 16px; padding: 14px 18px; }
+
+/* ══════════════════════════════════
+   2. PC 紧凑模式（B端）
+   ══════════════════════════════════ */
+@media (min-width: 1024px) {
+  .panel  { border-radius: 12px; padding: 14px 16px; }
+  .panel h4 { font-size: 14px; margin-bottom: 10px; }
+  .queue-row { padding: 10px 14px; border-radius: 10px; }
+  .metric-card-v2 { padding: 12px 14px; border-radius: 10px; }
+  .metric-card-v2 .mc-value { font-size: 22px; }
+  .el-card { border-radius: 12px; }
+  .el-button { border-radius: 8px; }
+}
+
+/* ══════════════════════════════════
+   2b. 移动端全局兜底（≤ 768px）
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Dialog 限宽 */
+  .el-dialog {
+    width: calc(100vw - 32px) !important;
+    margin: 16px auto !important;
+    max-width: 100vw !important;
+  }
+  .el-dialog .el-dialog__body { padding: 12px 16px !important; }
+
+  /* Drawer 全宽 */
+  .el-drawer { width: 100% !important; max-width: 100vw !important; }
+  .el-drawer__body { padding: 12px 16px !important; }
+
+  /* el-row 强制换行 */
+  .el-row { display: flex !important; flex-wrap: wrap !important; }
+
+  /* el-descriptions 以单列显示 */
+  .el-descriptions :deep(table) { display: block; }
+
+  /* el-form inline 模式折行 */
+  .el-form--inline { display: flex !important; flex-wrap: wrap !important; gap: 8px; }
+  .el-form--inline .el-form-item { margin-right: 0 !important; flex: 1 1 calc(50% - 4px); min-width: 120px; }
+
+  /* 页面顶部 page-header 紧凑化 */
+  .el-page-header { padding: 0 !important; }
+
+  /* 防止 table 撑出 */
+  .el-table { max-width: 100% !important; overflow-x: auto !important; }
+  .el-table .el-table__header th { font-size: 12px; padding: 6px 4px; }
+  .el-table .el-table__body td { font-size: 13px; padding: 8px 4px; }
+
+  /* Tabs 滚动 */
+  .el-tabs__nav-wrap { overflow-x: auto; }
+  .el-tabs__nav { flex-wrap: nowrap; }
+
+  /* Pagination 紧凑 */
+  .el-pagination { flex-wrap: wrap; gap: 4px; }
+  .el-pagination .el-pager li { min-width: 28px; height: 28px; font-size: 12px; }
+
+  /* Card / Button 紧凑 */
+  .el-card { margin-bottom: 12px; }
+  .el-card .el-card__body { padding: 12px !important; }
+  .el-button--small { padding: 6px 10px; font-size: 12px; }
+
+  /* 子页面整体包裹（防溢出） */
+  [style*="padding: 16px"],
+  [style*="padding:16px"],
+  [style*="padding: 20px"],
+  [style*="padding:20px"],
+  [style*="padding: 24px"],
+  [style*="padding:24px"] {
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ══════════════════════════════════
+   2c. 超小屏（≤ 480px）— 手机竖屏
+   ══════════════════════════════════ */
+@media (max-width: 480px) {
+  .el-dialog { width: calc(100vw - 16px) !important; margin: 8px auto !important; }
+  .el-dialog .el-dialog__header { padding: 12px 16px; }
+  .el-form--inline .el-form-item { flex: 1 1 100%; }
+  .page-header h2 { font-size: 18px; }
+  .page-header .page-subtitle { font-size: 12px; }
+}
+
+/* ══════════════════════════════════
+   3. 无障碍 focus-visible
+   ══════════════════════════════════ */
+*:focus:not(:focus-visible) { outline: none; }
+
+*:focus-visible {
+  outline: 2.5px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.slot-btn:focus-visible {
+  outline: 2.5px solid var(--primary);
+  outline-offset: 2px;
+  background: var(--primary-light);
+}
+
+.queue-row:focus-visible {
+  outline: 2.5px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════
+   4. @media print — 处方单 / 就诊记录
+   ══════════════════════════════════ */
+@media print {
+  .app-sidebar,
+  .bottom-tabbar,
+  .el-button,
+  .stepbar,
+  .segmented-tabs,
+  .page-toolbar .el-button,
+  .alert-bar .alert-close,
+  [id^="chart-"],
+  .elder-toggle-bar {
+    display: none !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    background: transparent !important;
+    border-color: #000 !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt;
+  }
+
+  .prescription-content .workspace-grid { display: block !important; }
+
+  .prescription-content .panel {
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    padding: 12pt 16pt;
+    margin-bottom: 12pt;
+    page-break-inside: avoid;
+  }
+
+  .prescription-content::before {
+    content: "社区卫生服务中心 电子处方";
+    display: block;
+    text-align: center;
+    font-size: 18pt;
+    font-weight: bold;
+    margin-bottom: 16pt;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 8pt;
+  }
+
+  .status-tag,
+  .chronic-tag,
+  .indicator-badge,
+  .alert-bar {
+    color: #000 !important;
+    background: transparent !important;
+    border: 0.5pt solid #666 !important;
+  }
+
+  h3, h4 { page-break-after: avoid; }
+  .panel { page-break-inside: avoid; }
+}
+
+/* ══════════════════════════════════
+   NProgress 主题色覆盖
+═══════════════════════════════════ */
+#nprogress .bar { background: var(--primary); height: 3px; }
+#nprogress .peg { box-shadow: 0 0 10px var(--primary), 0 0 5px var(--primary); }

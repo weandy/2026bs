@@ -1,0 +1,228 @@
+/* ============================================================
+   Design Tokens — 社区卫生平台
+   覆盖 Element Plus 变量 + 项目自有 Token
+   ============================================================ */
+
+:root {
+  /* ── 主品牌色 Primary Green ── */
+  --primary: #2f6b57;
+  --primary-strong: #1f5644;
+  --primary-light: rgba(47, 107, 87, 0.08);
+  --primary-light-hover: rgba(47, 107, 87, 0.12);
+
+  /* ── 角色辅色 ── */
+  --medical: #4d6f99;
+  --admin: #9b7441;
+  --accent-purple: #7c5cbf;
+
+  /* ── 功能语义色 ── */
+  --good: #27ae60;
+  --warn: #e67e22;
+  --danger: #c0392b;
+  --info: #1a6bb5;
+
+  /* ── 语义背景/文字色组 ── */
+  --bg-success: #e8f8f0;  --text-success: #1e8449;
+  --bg-warning: #fef3e7;  --text-warning: #ba6414;
+  --bg-danger:  #fdecea;  --text-danger:  #962d22;
+  --bg-info:    #ebf4ff;  --text-info:    #0d3d73;
+
+  /* ── 布局/表面色 ── */
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-soft: #f7faf8;
+  --text: #23312d;
+  --text-strong: #1a2820;
+  --muted: #63756d;
+  --border: #d9e1db;
+  --border-strong: #e4e7ed;
+
+  /* ── 中性灰阶梯 ── */
+  --neutral-300: #c0c4cc;
+  --neutral-400: #909399;
+  --neutral-500: #6b7280;
+
+  /* ── 阴影 ── */
+  --shadow: 0 20px 60px rgba(35, 49, 45, 0.08);
+  --shadow-sm: 0 4px 12px rgba(35, 49, 45, 0.08);
+
+  /* ── 过渡 ── */
+  --ease: 0.2s ease;
+
+  /* ── 字体 ── */
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* ── 工作台局部滚动高度（由 ResidentLayout/AdminLayout 动态注入 --header-h） ── */
+  --header-h: 56px;
+  --workspace-h: calc(100vh - var(--header-h) - 32px);
+
+  /* ──────────────────────────────────────
+     Element Plus 变量覆盖
+     ────────────────────────────────────── */
+  --el-color-primary: #2f6b57;
+  --el-color-primary-light-3: #4d9179;
+  --el-color-primary-light-5: #69a88e;
+  --el-color-primary-light-7: #96c5b3;
+  --el-color-primary-light-8: #b3d5c8;
+  --el-color-primary-light-9: #d9eee7;
+  --el-color-primary-dark-2: #1f5644;
+
+  --el-bg-color-page: #f6f7f4;
+  --el-bg-color: #ffffff;
+  --el-bg-color-overlay: #ffffff;
+
+  --el-text-color-primary: #23312d;
+  --el-text-color-regular: #23312d;
+  --el-text-color-secondary: #63756d;
+  --el-text-color-placeholder: #9db3ac;
+
+  --el-border-color: #d9e1db;
+  --el-border-color-light: #e4e7ed;
+  --el-border-color-lighter: #eef2ef;
+
+  --el-border-radius-base: 10px;
+  --el-border-radius-small: 6px;
+  --el-border-radius-round: 999px;
+
+  --el-font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --el-box-shadow: 0 4px 12px rgba(35, 49, 45, 0.08);
+  --el-box-shadow-light: 0 2px 8px rgba(35, 49, 45, 0.06);
+
+  /* 按钮圆角 */
+  --el-button-border-radius: 10px;
+
+  /* Card */
+  --el-card-border-radius: 16px;
+  --el-card-padding: 18px;
+  --el-card-border-color: #d9e1db;
+
+  /* Tag */
+  --el-tag-border-radius: 999px;
+
+  /* Input */
+  --el-input-border-radius: 10px;
+
+  /* 侧边菜单主色 */
+  --el-menu-active-color: #2f6b57;
+  --el-menu-hover-bg-color: rgba(47, 107, 87, 0.08);
+}
+
+/* ──────────────────────────────────────
+   🎴 暗黑模式 (Dark Mode Variables)
+   配合 <html class="dark"> 激活
+   ────────────────────────────────────── */
+html.dark {
+  /* 主色保持一定对比度，但降低刺眼程度 */
+  --primary: #4d9179;
+  --primary-strong: #69a88e;
+  --primary-light: rgba(77, 145, 121, 0.15);
+  --primary-light-hover: rgba(77, 145, 121, 0.25);
+
+  --medical: #6b94c6;
+  --admin: #b38b4d;
+  --accent-purple: #9071d0;
+
+  --good: #34c759;
+  --warn: #ff9f0a;
+  --danger: #ff453a;
+  --info: #0a84ff;
+
+  --bg-success: rgba(52, 199, 89, 0.15);  --text-success: #34c759;
+  --bg-warning: rgba(255, 159, 10, 0.15);  --text-warning: #ff9f0a;
+  --bg-danger:  rgba(255, 69, 58, 0.15);   --text-danger:  #ff453a;
+  --bg-info:    rgba(10, 132, 255, 0.15);  --text-info:    #0a84ff;
+
+  /* 暗场卡片、背景色阶 */
+  --bg: #111111;
+  --surface: #1e1e1e;
+  --surface-soft: #262626;
+  
+  --text: #ffffff;
+  --muted: #a1a1aa;
+  
+  --border: #333333;
+  --border-strong: #444444;
+
+  --neutral-300: #71717a;
+  --neutral-400: #52525b;
+  --neutral-500: #a1a1aa;
+
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  /* Element Plus 暗黑覆盖 */
+  --el-bg-color-page: #111111;
+  --el-bg-color: #1e1e1e;
+  --el-bg-color-overlay: #262626;
+
+  --el-text-color-primary: #ffffff;
+  --el-text-color-regular: #e5e5e5;
+  --el-text-color-secondary: #a1a1aa;
+  --el-text-color-placeholder: #71717a;
+
+  --el-border-color: #333333;
+  --el-border-color-light: #444444;
+  --el-border-color-lighter: #555555;
+  --el-card-border-color: #333333;
+}
+
+/* ── 全局字体 ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ── EP Card 覆盖边框色 ── */
+.el-card {
+  border-color: var(--border) !important;
+}
+
+/* ── EP Tabs 改为 Pill 形态 ── */
+.el-tabs--card > .el-tabs__header {
+  border-bottom: none;
+}
+.el-tabs--card > .el-tabs__header .el-tabs__nav {
+  background: var(--surface-soft);
+  border-radius: 12px;
+  border: none;
+  padding: 4px;
+}
+.el-tabs--card > .el-tabs__header .el-tabs__item {
+  border: none;
+  border-radius: 8px;
+  color: var(--muted);
+  transition: all var(--ease);
+}
+.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
+  background: var(--surface);
+  color: var(--primary-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── EP Steps 绿主题 ── */
+.el-step__head.is-process {
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.el-step__head.is-finish {
+  color: var(--good) !important;
+  border-color: var(--good) !important;
+}
+.el-step__line-inner {
+  background-color: var(--good);
+}
+
+/* ── EP Button 微调 ── */
+.el-button {
+  font-family: var(--font-sans);
+}

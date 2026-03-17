@@ -1,0 +1,12 @@
+{
+  "module": "认证模块",
+  "baseUrl": "http://localhost:8080/api",
+  "login": {"endpoint": "/auth/staff/login", "body": {"username": "DR001", "password": "123456"}},
+  "tests": [
+    {"name": "医护登录-正确密码", "method": "POST", "path": "/auth/staff/login", "body": {"username": "DR001", "password": "123456"}, "expectCode": 200},
+    {"name": "医护登录-错误密码", "method": "POST", "path": "/auth/staff/login", "body": {"username": "DR001", "password": "wrong"}, "expectCode": 400, "expectHttp": 400},
+    {"name": "居民登录-正确", "method": "POST", "path": "/auth/resident/login", "body": {"phone": "13800000001", "password": "123456"}, "expectCode": 200},
+    {"name": "无Token访问受保护接口", "method": "GET", "path": "/resident/profile", "expectCode": 401, "expectHttp": 401},
+    {"name": "公屏-无需登录", "method": "GET", "path": "/public/screen/QKMZ", "expectCode": 200}
+  ]
+}
