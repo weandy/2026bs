@@ -6,4 +6,11 @@
 
 3.登陆输入错用户名和密码的时候状态码返回401显示用户名或密码错误，但是前端提醒“登录已过期，请重新登录“修复这个bug
 
-4.居民端http://localhost:5173/resident/visit-records就诊记录里面，你应该是把日期放到上面，同时这个状态也要是筛选选项应该是展现出来的，而不是需要点击之后再筛选的，
+4.居民端http://localhost:5173/resident/visit-records就诊记录里面，你应该是把日期放到上面，同时这个状态也要是筛选选项应该是展现出来的，而不是需要点击之后再筛选的，/html/body/div[1]/section/section/main/div/form/div/div/div。一定要分析出这个系统里面的其他地方还有没有这个问题，可以调用skills分析
+
+5.居民端预约的时候可以支持查看医生的个人信息，是可以点击查看的，提供一个按键，或者说一个简短的介绍：擅长xxxx等，你看着搞就行，主要是数据来源要来自于医护端的个人中心设置内容
+<div data-v-67ad4b0c="" class="doctor-card"><div data-v-67ad4b0c="" class="doctor-header"><strong data-v-67ad4b0c="">李明华</strong><span data-v-67ad4b0c="" class="status-tag cancelled">约满</span></div><div data-v-67ad4b0c="" class="slot-list"></div></div>
+
+而这个地方要刚好对接着医护端我们新增的个人中心的功能
+
+6.居民端的签约月
