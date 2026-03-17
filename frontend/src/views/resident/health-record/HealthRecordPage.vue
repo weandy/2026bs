@@ -3,7 +3,7 @@
     <!-- 头部：使用全局 page-header 类 -->
     <div class="page-header">
       <div class="page-header-main">
-        <h2>健康档案概览</h2>
+        <h2>我的档案</h2>
         <p>建档日期: {{ formatDate(record?.createdAt) }}，最近更新: {{ formatDate(record?.updatedAt) }}</p>
       </div>
       <div class="page-header-actions">
@@ -200,31 +200,48 @@ onMounted(async () => {
   try {
     const res = await request.get('/resident/visit-record', { params: { page: 1, size: 20 } })
     recentVisits.value = res.data?.records || []
-    
-    // 解析 physicalExam JSON
-    const parseVitals = (pexam) => {
-      try { return pexam ? JSON.parse(pexam) : {} } catch(e) { return {} }
-    }
+  } catch (e) { console.warn(e) }
 
-    // 提取体征与趋势
-    const visits = [...recentVisits.value].reverse() // 按时间正序用于图表
-    const dates = visits.map(v => v.visitDate?.substring(0,10) || v.createdAt?.substring(0,10))
-    const bpData = visits.map(v => parseVitals(v.physicalExam).bloodPressureSys || null)
-    const glucoseData = visits.map(v => parseVitals(v.physicalExam).bloodGlucose || null)
-    const weightData = visits.map(v => parseVitals(v.physicalExam).weight || null)
+  // 从 health_vital 表获取趋势数据（创新点①）
+  try {
+    const [bpRes, glucoseRes, weightRes, latestRes] = await Promise.all([
+      request.get('/resident/vital', { params: { type: 'blood_pressure', days: 180 } }),
+      request.get('/resident/vital', { params: { type: 'blood_glucose', days: 180 } }),
+      request.get('/resident/vital', { params: { type: 'weight', days: 180 } }),
+      request.get('/resident/vital/latest')
+    ])
 
-    // 给最新体征面板用（取最近的一次非空记录）
-    const sysVals = recentVisits.value.map(v => parseVitals(v.physicalExam)).filter(p => p.bloodPressureSys).map(p => `${p.bloodPressureSys}/${p.bloodPressureDia||80}`)
-    if (sysVals.length) latestVitals.bp = sysVals[0]
-    
-    const gluVals = recentVisits.value.map(v => parseVitals(v.physicalExam)).filter(p => p.bloodGlucose).map(p => p.bloodGlucose)
-    if (gluVals.length) latestVitals.glucose = gluVals[0]
+    // 最新指标
+    const latestMap = latestRes.data || {}
+    if (latestMap.blood_pressure) latestVitals.bp = latestMap.blood_pressure.vitalValue
+    if (latestMap.blood_glucose)  latestVitals.glucose = latestMap.blood_glucose.vitalValue
+    if (latestMap.weight)         latestVitals.weight = latestMap.weight.vitalValue
 
-    const whtVals = recentVisits.value.map(v => parseVitals(v.physicalExam)).filter(p => p.weight).map(p => p.weight)
-    if (whtVals.length) latestVitals.weight = whtVals[0]
+    // 趋势图数据
+    const bpList = (bpRes.data || []).reverse()
+    const glucoseList = (glucoseRes.data || []).reverse()
+    const weightList = (weightRes.data || []).reverse()
 
-    const hasSomeData = [...bpData, ...glucoseData, ...weightData].some(v => v !== null)
-    if (hasSomeData) {
+    // 合并所有日期，X 轴
+    const allDates = new Set()
+    ;[bpList, glucoseList, weightList].forEach(list =>
+      list.forEach(v => allDates.add(v.measureTime?.substring(0, 10)))
+    )
+    const dates = [...allDates].sort()
+
+    if (dates.length > 0) {
+      const mapByDate = (list) => {
+        const m = {}
+        list.forEach(v => { m[v.measureTime?.substring(0, 10)] = v.vitalValue })
+        return dates.map(d => {
+          const val = m[d]
+          if (!val) return null
+          // 血压取收缩压
+          if (val.includes('/')) return parseInt(val.split('/')[0]) || null
+          return parseFloat(val) || null
+        })
+      }
+
       vitalChartOption.value = {
         tooltip: { trigger: 'axis' },
         legend: { data: ['收缩压(mmHg)', '血糖(mmol/L)', '体重(kg)'], bottom: 0 },
@@ -232,20 +249,19 @@ onMounted(async () => {
         xAxis: { type: 'category', data: dates, boundaryGap: false },
         yAxis: { type: 'value' },
         series: [
-          { name: '收缩压(mmHg)', type: 'line', data: bpData, smooth: true, connectNulls: true, itemStyle: { color: 'var(--danger)' }, lineStyle: { width: 3 } },
-          { name: '血糖(mmol/L)', type: 'line', data: glucoseData, smooth: true, connectNulls: true, itemStyle: { color: 'var(--warn)' }, lineStyle: { width: 3 } },
-          { name: '体重(kg)', type: 'line', data: weightData, smooth: true, connectNulls: true, itemStyle: { color: 'var(--primary)' }, lineStyle: { width: 3 } }
+          { name: '收缩压(mmHg)', type: 'line', data: mapByDate(bpList), smooth: true, connectNulls: true, itemStyle: { color: '#c0392b' }, lineStyle: { width: 3 } },
+          { name: '血糖(mmol/L)', type: 'line', data: mapByDate(glucoseList), smooth: true, connectNulls: true, itemStyle: { color: '#e67e22' }, lineStyle: { width: 3 } },
+          { name: '体重(kg)', type: 'line', data: mapByDate(weightList), smooth: true, connectNulls: true, itemStyle: { color: '#2f6b57' }, lineStyle: { width: 3 } }
         ]
       }
     }
-  } catch (e) { console.warn(e) }
+  } catch (e) { console.warn('加载健康指标趋势失败', e) }
 })
 </script>
 
 <style scoped>
 .health-record-page {
   padding: 16px;
-  max-width: 1200px;
   margin: 0 auto;
 }
 .divider { margin: 0 10px; opacity: 0.3; }

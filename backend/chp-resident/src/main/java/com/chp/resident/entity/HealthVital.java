@@ -14,5 +14,7 @@ public class HealthVital {
     private String vitalValue;
     private LocalDateTime measureTime;
     private String note;
+    private Long recordedBy;
+    private String recordedByName;
     private LocalDateTime createdAt;
 }

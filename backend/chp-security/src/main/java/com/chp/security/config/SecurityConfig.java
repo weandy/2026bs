@@ -57,8 +57,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // 管理员接口 — 仅 ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // 医护接口 — DOCTOR 或 ADMIN
-                        .requestMatchers("/medical/**").hasAnyRole("DOCTOR", "ADMIN")
+                        // 医护接口 — DOCTOR / NURSE / ADMIN
+                        .requestMatchers("/medical/**").hasAnyRole("DOCTOR", "NURSE", "ADMIN")
                         // 居民接口 — RESIDENT
                         .requestMatchers("/resident/**").hasRole("RESIDENT")
                         // 其他需要认证
