@@ -10,6 +10,7 @@ import com.chp.resident.mapper.FamilyMemberMapper;
 import com.chp.resident.mapper.HealthRecordMapper;
 import com.chp.resident.mapper.HealthVitalMapper;
 import com.chp.resident.mapper.VisitRecordMapper;
+import com.chp.security.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,8 @@ public class FamilyMemberController {
     private final HealthVitalMapper healthVitalMapper;
 
     @GetMapping
-    public Result<List<FamilyMember>> list(@RequestAttribute("residentId") Long residentId) {
+    public Result<List<FamilyMember>> list() {
+        Long residentId = SecurityUtils.getCurrentUserId();
         return Result.success(mapper.selectList(
                 new LambdaQueryWrapper<FamilyMember>()
                         .eq(FamilyMember::getOwnerId, residentId)
@@ -35,8 +37,8 @@ public class FamilyMemberController {
     }
 
     @PostMapping
-    public Result<?> add(@RequestBody FamilyMember member,
-                         @RequestAttribute("residentId") Long residentId) {
+    public Result<?> add(@RequestBody FamilyMember member) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         member.setOwnerId(residentId);
         member.setStatus(1);
         // 自动设置权限范围（创新点③）
@@ -49,8 +51,8 @@ public class FamilyMemberController {
 
     /** 代查看接口（创新点③）—— 根据 permissionScope 过滤返回被代管人的健康数据 */
     @GetMapping("/{id}/proxy-view")
-    public Result<?> proxyView(@PathVariable Long id,
-                                @RequestAttribute("residentId") Long residentId) {
+    public Result<?> proxyView(@PathVariable Long id) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         FamilyMember fm = mapper.selectById(id);
         if (fm == null || !fm.getOwnerId().equals(residentId) || fm.getStatus() != 1)
             return Result.error(403, "无权查看");
@@ -116,8 +118,8 @@ public class FamilyMemberController {
     }
 
     @PutMapping("/{id}")
-    public Result<?> update(@PathVariable Long id, @RequestBody FamilyMember member,
-                            @RequestAttribute("residentId") Long residentId) {
+    public Result<?> update(@PathVariable Long id, @RequestBody FamilyMember member) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         FamilyMember existing = mapper.selectById(id);
         if (existing == null || !existing.getOwnerId().equals(residentId))
             return Result.error(400, "无权操作");
@@ -128,8 +130,8 @@ public class FamilyMemberController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable Long id,
-                            @RequestAttribute("residentId") Long residentId) {
+    public Result<?> delete(@PathVariable Long id) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         FamilyMember m = mapper.selectById(id);
         if (m == null || !m.getOwnerId().equals(residentId))
             return Result.error(400, "无权操作");

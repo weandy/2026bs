@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.chp.common.result.Result;
 import com.chp.resident.entity.HealthVital;
 import com.chp.resident.mapper.HealthVitalMapper;
+import com.chp.security.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class HealthVitalController {
 
     /** 录入一条健康指标 */
     @PostMapping
-    public Result<?> record(@RequestBody HealthVital vital,
-                            @RequestAttribute("residentId") Long residentId) {
+    public Result<?> record(@RequestBody HealthVital vital) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         vital.setResidentId(residentId);
         if (vital.getMeasureTime() == null) vital.setMeasureTime(LocalDateTime.now());
         mapper.insert(vital);
@@ -32,8 +33,8 @@ public class HealthVitalController {
     /** 按类型查询历史数据 */
     @GetMapping
     public Result<List<HealthVital>> list(@RequestParam String type,
-                                         @RequestParam(defaultValue = "30") Integer days,
-                                         @RequestAttribute("residentId") Long residentId) {
+                                         @RequestParam(defaultValue = "30") Integer days) {
+        Long residentId = SecurityUtils.getCurrentUserId();
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<HealthVital> list = mapper.selectList(
                 new LambdaQueryWrapper<HealthVital>()
@@ -46,7 +47,8 @@ public class HealthVitalController {
 
     /** 获取最新一条各指标 */
     @GetMapping("/latest")
-    public Result<Map<String, HealthVital>> latest(@RequestAttribute("residentId") Long residentId) {
+    public Result<Map<String, HealthVital>> latest() {
+        Long residentId = SecurityUtils.getCurrentUserId();
         List<HealthVital> all = mapper.selectList(
                 new LambdaQueryWrapper<HealthVital>()
                         .eq(HealthVital::getResidentId, residentId)

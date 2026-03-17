@@ -267,7 +267,8 @@ onMounted(async () => {
     align-items: start;
   }
   .shortcut-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
   }
 }
 
