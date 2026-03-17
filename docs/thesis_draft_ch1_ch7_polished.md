@@ -9,8 +9,16 @@
 4.居民端http://localhost:5173/resident/visit-records就诊记录里面，你应该是把日期放到上面，同时这个状态也要是筛选选项应该是展现出来的，而不是需要点击之后再筛选的，/html/body/div[1]/section/section/main/div/form/div/div/div。一定要分析出这个系统里面的其他地方还有没有这个问题，可以调用skills分析
 
 5.居民端预约的时候可以支持查看医生的个人信息，是可以点击查看的，提供一个按键，或者说一个简短的介绍：擅长xxxx等，你看着搞就行，主要是数据来源要来自于医护端的个人中心设置内容
+
 <div data-v-67ad4b0c="" class="doctor-card"><div data-v-67ad4b0c="" class="doctor-header"><strong data-v-67ad4b0c="">李明华</strong><span data-v-67ad4b0c="" class="status-tag cancelled">约满</span></div><div data-v-67ad4b0c="" class="slot-list"></div></div>
 
 而这个地方要刚好对接着医护端我们新增的个人中心的功能
 
-6.居民端的签约月
+6.在这个系统里面，所有人的姓名和手机号，身份证号码等敏感信息，暂时都不需要进行打码星号替代等操作，均使用真实信息，例如不存在李医生，只有李四医生（举例而已
+
+7，居民端的就诊记录里面，查看的时候这个位置应该是显示的当天的日期<span data-v-d912fb1d="" class="visit-no">VR3031</span>
+而之前日期的位置应该是显示当时的就诊编号
+
+
+
+8.
