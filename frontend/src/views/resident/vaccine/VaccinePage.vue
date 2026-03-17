@@ -13,23 +13,21 @@
     <!-- 可接种疫苗列表 -->
     <template v-if="activeTab === 'available'">
       <el-empty v-if="vaccineList.length === 0 && !loadingVaccines" description="暂无可接种疫苗" />
-      <el-row :gutter="12" v-loading="loadingVaccines">
-        <el-col :span="12" v-for="v in vaccineList" :key="v.id">
-          <el-card shadow="hover" class="vaccine-card">
-            <div class="vaccine-name">{{ v.vaccineName }}</div>
-            <div class="vaccine-meta">
-              <span>厂家: {{ v.manufacturer || '—' }}</span>
-              <span>库存: <strong :style="{ color: v.quantity <= (v.alertQty || 0) ? 'var(--danger)' : 'var(--good)' }">{{ v.quantity }}</strong></span>
-            </div>
-            <div class="vaccine-meta" v-if="v.expiryDate">
-              有效期至: {{ v.expiryDate }}
-            </div>
-            <el-button type="primary" size="small" style="margin-top:8px;width:100%" @click="openBooking(v)">
-              预约接种
-            </el-button>
-          </el-card>
-        </el-col>
-      </el-row>
+      <div class="vaccine-grid" v-loading="loadingVaccines">
+        <el-card v-for="v in vaccineList" :key="v.id" shadow="hover" class="vaccine-card">
+          <div class="vaccine-name">{{ v.vaccineName }}</div>
+          <div class="vaccine-meta">
+            <span>厂家: {{ v.manufacturer || '—' }}</span>
+            <span>库存: <strong :style="{ color: v.quantity <= (v.alertQty || 0) ? 'var(--danger)' : 'var(--good)' }">{{ v.quantity }}</strong></span>
+          </div>
+          <div class="vaccine-meta" v-if="v.expiryDate">
+            有效期至: {{ v.expiryDate }}
+          </div>
+          <el-button type="primary" size="small" style="margin-top:8px;width:100%" @click="openBooking(v)">
+            预约接种
+          </el-button>
+        </el-card>
+      </div>
     </template>
 
     <!-- 我的预约 -->
@@ -161,7 +159,13 @@ onMounted(() => loadAvailable())
 </script>
 
 <style scoped>
-.vaccine-card { margin-bottom: 12px; }
+/* ── 基础样式 ── */
+.vaccine-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.vaccine-card { margin-bottom: 0; }
 .vaccine-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
 .vaccine-meta { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 2px; }
 .item-card { margin-bottom: 12px; }
@@ -171,10 +175,26 @@ onMounted(() => loadAvailable())
 /* 移动端适配 */
 @media (max-width: 768px) {
   .vaccine-page { padding: 12px; }
-  .vaccine-page :deep(.el-col) {
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-    margin-bottom: 10px;
+}
+
+/* ══ PC 桌面端 (≥ 768px) ══ */
+@media (min-width: 768px) {
+  .vaccine-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 24px;
+  }
+  .vaccine-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .item-card {
+    max-width: 700px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .vaccine-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 </style>

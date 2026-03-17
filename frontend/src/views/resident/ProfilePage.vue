@@ -1,41 +1,51 @@
 <template>
   <div class="profile-page">
-    <el-card shadow="never" class="profile-card">
-      <template #header><span>个人信息</span></template>
-      <el-descriptions :column="descColumn" border v-if="profile" v-loading="loading">
-        <el-descriptions-item label="姓名">{{ profile.name }}</el-descriptions-item>
-        <el-descriptions-item label="手机号">{{ profile.phone }}</el-descriptions-item>
-        <el-descriptions-item label="性别">{{ profile.gender === 1 ? '男' : '女' }}</el-descriptions-item>
-        <el-descriptions-item label="出生日期">{{ profile.birthDate || '未设置' }}</el-descriptions-item>
-        <el-descriptions-item label="身份证">{{ profile.idCard || '未设置' }}</el-descriptions-item>
-        <el-descriptions-item label="血型">{{ profile.bloodType || '未设置' }}</el-descriptions-item>
-        <el-descriptions-item label="地址" :span="descColumn">{{ profile.address || '未设置' }}</el-descriptions-item>
-      </el-descriptions>
-    </el-card>
+    <div class="profile-grid">
 
-    <el-card shadow="never" class="profile-card">
-      <template #header>
-        <div class="card-header-row">
-          <span>紧急联系人</span>
-          <el-button type="primary" size="small" @click="showContactDlg = true">{{ contactForm.name ? '编辑' : '添加' }}</el-button>
-        </div>
-      </template>
-      <el-descriptions :column="descColumn" border v-if="contactForm.name">
-        <el-descriptions-item label="姓名">{{ contactForm.name }}</el-descriptions-item>
-        <el-descriptions-item label="关系">{{ contactForm.relation }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ contactForm.phone }}</el-descriptions-item>
-      </el-descriptions>
-      <el-empty v-else description="未设置紧急联系人" :image-size="48" />
-    </el-card>
+      <!-- 左栏：个人资料 -->
+      <div class="profile-col profile-col-left">
+        <el-card shadow="never" class="profile-card">
+          <template #header><span>个人信息</span></template>
+          <el-descriptions :column="descColumn" border v-if="profile" v-loading="loading">
+            <el-descriptions-item label="姓名">{{ profile.name }}</el-descriptions-item>
+            <el-descriptions-item label="手机号">{{ profile.phone }}</el-descriptions-item>
+            <el-descriptions-item label="性别">{{ profile.gender === 1 ? '男' : '女' }}</el-descriptions-item>
+            <el-descriptions-item label="出生日期">{{ profile.birthDate || '未设置' }}</el-descriptions-item>
+            <el-descriptions-item label="身份证">{{ profile.idCard || '未设置' }}</el-descriptions-item>
+            <el-descriptions-item label="血型">{{ profile.bloodType || '未设置' }}</el-descriptions-item>
+            <el-descriptions-item label="地址" :span="descColumn">{{ profile.address || '未设置' }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
 
-    <el-card shadow="never" class="profile-card">
-      <template #header><span>系统设置</span></template>
-      <div class="settings-actions">
-        <el-button type="primary" @click="showPwdDialog = true">修改密码</el-button>
-        <el-button @click="showPhoneDialog = true">修改手机号</el-button>
-        <el-button type="danger" @click="handleLogout">退出登录</el-button>
+        <el-card shadow="never" class="profile-card">
+          <template #header>
+            <div class="card-header-row">
+              <span>紧急联系人</span>
+              <el-button type="primary" size="small" @click="showContactDlg = true">{{ contactForm.name ? '编辑' : '添加' }}</el-button>
+            </div>
+          </template>
+          <el-descriptions :column="descColumn" border v-if="contactForm.name">
+            <el-descriptions-item label="姓名">{{ contactForm.name }}</el-descriptions-item>
+            <el-descriptions-item label="关系">{{ contactForm.relation }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{ contactForm.phone }}</el-descriptions-item>
+          </el-descriptions>
+          <el-empty v-else description="未设置紧急联系人" :image-size="48" />
+        </el-card>
       </div>
-    </el-card>
+
+      <!-- 右栏：系统设置 -->
+      <div class="profile-col profile-col-right">
+        <el-card shadow="never" class="profile-card">
+          <template #header><span>系统设置</span></template>
+          <div class="settings-actions">
+            <el-button type="primary" @click="showPwdDialog = true">修改密码</el-button>
+            <el-button @click="showPhoneDialog = true">修改手机号</el-button>
+            <el-button type="danger" @click="handleLogout">退出登录</el-button>
+          </div>
+        </el-card>
+      </div>
+
+    </div>
 
     <!-- 修改密码 -->
     <el-dialog v-model="showPwdDialog" title="修改密码" width="400px">
@@ -212,6 +222,10 @@ const saveContact = async () => {
   margin: 0 auto;
 }
 
+.profile-grid {
+  display: block;
+}
+
 .profile-card {
   margin-bottom: 16px;
   border-radius: 14px;
@@ -232,6 +246,30 @@ const saveContact = async () => {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .profile-page { padding: 12px; }
+
+  .settings-actions {
+    flex-direction: column;
+  }
+
+  .settings-actions .el-button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+}
+
+/* ══ PC 桌面端双栏布局 (≥ 768px) ══ */
+@media (min-width: 768px) {
+  .profile-page {
+    max-width: 1000px;
+    padding: 24px 32px;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 20px;
+    align-items: start;
+  }
 
   .settings-actions {
     flex-direction: column;

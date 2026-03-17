@@ -382,6 +382,14 @@ onMounted(() => {
 <style scoped>
 .appointment-page { padding: 16px; max-width: 860px; margin: 0 auto; }
 
+/* ══ PC 桌面端 (≥ 768px) ══ */
+@media (min-width: 768px) {
+  .appointment-page {
+    max-width: 1100px;
+    padding: 24px 32px;
+  }
+}
+
 /* 步骤提示 */
 .step-hint { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
