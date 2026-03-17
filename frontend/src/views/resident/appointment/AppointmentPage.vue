@@ -95,6 +95,10 @@
                 </span>
                 <span class="status-tag cancelled" v-else>约满</span>
               </div>
+              <div v-if="doctorProfiles[sch.staffId]" class="doctor-specialty">
+                擅长：{{ doctorProfiles[sch.staffId].specialty || '未设置' }}
+                <span class="profile-link" @click="showDoctorInfo(sch)">查看简介</span>
+              </div>
               <div class="slot-list">
                 <button
                   v-for="slot in slotsMap[sch.id]"
@@ -220,6 +224,18 @@
 
     </template>
   </div>
+
+  <!-- #5 医生简介弹窗 -->
+  <el-dialog v-model="docInfoVisible" title="医生个人简介" width="400px">
+    <div v-if="docInfo" class="doc-info-body">
+      <p><strong>姓名：</strong>{{ docInfo.name }}</p>
+      <p><strong>科室：</strong>{{ docInfo.dept_name || docInfo.deptName }}</p>
+      <p><strong>职称：</strong>{{ docInfo.title || '未设置' }}</p>
+      <p><strong>从医年限：</strong>{{ docInfo.years_exp ? docInfo.years_exp + '年' : '未设置' }}</p>
+      <p><strong>擅长：</strong>{{ docInfo.specialty || '未设置' }}</p>
+      <p><strong>简介：</strong>{{ docInfo.bio || '暂无简介' }}</p>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -237,6 +253,9 @@ const slotsMap = ref({})
 const selectedSchedule = ref(null)
 const selectedSlot = ref(null)
 const contractDoctorId = ref(null)
+const docInfoVisible = ref(false)
+const docInfo = ref(null)
+const doctorProfiles = reactive({})
 const submitting = ref(false)
 const formRef = ref()
 const createdAppt = ref({})
@@ -321,6 +340,13 @@ async function loadSchedules() {
     for (const sch of schedules.value) {
       const slotRes = await request.get(`/resident/appointment/slots/${sch.id}`)
       slotsMap.value[sch.id] = slotRes.data || []
+      // 加载医生简介
+      if (sch.staffId && !doctorProfiles[sch.staffId]) {
+        try {
+          const pRes = await request.get(`/medical/profile/public/${sch.staffId}`)
+          if (pRes.data) doctorProfiles[sch.staffId] = pRes.data
+        } catch {}
+      }
     }
   } catch (e) { /* handled */ }
 }
@@ -329,6 +355,11 @@ function selectSlot(sch, slot) {
   if (slot.remaining <= 0) return
   selectedSchedule.value = sch
   selectedSlot.value = slot
+}
+
+function showDoctorInfo(sch) {
+  docInfo.value = doctorProfiles[sch.staffId] || { name: sch.staffName }
+  docInfoVisible.value = true
 }
 
 async function submitAppointment() {
@@ -472,6 +503,14 @@ onMounted(() => {
   font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600;
   background: rgba(47,107,87,0.12); color: var(--primary);
 }
+.doctor-specialty {
+  font-size: 12px; color: var(--muted); margin-top: 4px; padding: 0 4px;
+}
+.profile-link {
+  margin-left: 8px; color: var(--primary); cursor: pointer; font-size: 12px;
+}
+.profile-link:hover { text-decoration: underline; }
+.doc-info-body p { margin: 8px 0; font-size: 14px; }
 
 /* 时段格子 */
 .slot-list {

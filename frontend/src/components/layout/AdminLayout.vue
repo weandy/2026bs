@@ -93,7 +93,7 @@ import {
   CalendarDays, LayoutDashboard, Users, Stethoscope, Settings,
   ScrollText, HeartPulse, Menu, Syringe, Building2, BookOpen,
   PackageSearch, ArrowLeftRight, Sun, Moon, BarChart3, Repeat2, MessageSquare,
-  UserSearch, FileSignature, Newspaper, Trophy
+  UserSearch, FileSignature, Newspaper, Trophy, UserRound
 } from 'lucide-vue-next'
 
 const userStore = useUserStore()
@@ -127,6 +127,7 @@ const medicalNav = computed(() => [
   { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe, visible: userRole.value !== 'DOCTOR' },
   { path: '/medical/prescription',  label: '处方记录',   shortLabel: '处方',   icon: FileText, visible: userRole.value !== 'NURSE' },
   { path: '/medical/my-schedule',   label: '我的排班',   shortLabel: '排班',   icon: CalendarDays },
+  { path: '/medical/profile',       label: '个人中心',   shortLabel: '我的',   icon: UserRound },
 ])
 
 const adminNav = computed(() => [
