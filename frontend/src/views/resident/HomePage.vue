@@ -65,8 +65,8 @@
       <!-- 右栏 -->
       <div class="home-col home-col-right">
 
-        <!-- ③ 快捷服务 -->
-        <div class="home-card">
+        <!-- ③ 快捷服务（仅移动端） -->
+        <div class="home-card mobile-only">
           <div class="card-title-row">
             <strong>快捷服务</strong>
             <span class="muted">全部服务</span>
@@ -82,6 +82,24 @@
                 <component :is="item.icon" :size="20" />
               </span>
               <span>{{ item.label }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③-PC 近期就诊（仅桌面端） -->
+        <div class="home-card desktop-only">
+          <div class="card-title-row">
+            <strong>近期就诊</strong>
+            <span class="muted link" @click="router.push('/resident/visit-records')">查看全部</span>
+          </div>
+          <div v-if="recentVisits.length === 0" class="empty-tip">暂无就诊记录</div>
+          <div v-for="v in recentVisits" :key="v.id" class="visit-item">
+            <div class="vi-top">
+              <strong class="item-title">{{ v.diagnosis || '暂无诊断' }}</strong>
+              <span class="item-meta">{{ v.createdAt?.split('T')[0] || '' }}</span>
+            </div>
+            <div class="vi-bottom" v-if="v.chiefComplaint">
+              <span class="vi-complaint">主诉：{{ v.chiefComplaint }}</span>
             </div>
           </div>
         </div>
@@ -178,13 +196,16 @@ const heroSub = computed(() => {
 
 const shortcuts = [
   { path: '/resident/appointment',    icon: CalendarDays, label: '预约挂号', color: 'var(--primary)', bgColor: 'rgba(47,107,87,0.1)' },
-  { path: '/resident/queue-progress', icon: Clipboard,    label: '候诊进度', color: 'var(--accent-purple)', bgColor: 'rgba(125,60,152,0.1)' },
   { path: '/resident/visit-records',  icon: FileText,     label: '就诊记录', color: 'var(--medical)', bgColor: 'rgba(26,107,181,0.1)' },
   { path: '/resident/health-record',  icon: ClipboardList,label: '我的档案', color: '#27ae60', bgColor: 'rgba(39,174,96,0.1)' },
+  { path: '/resident/follow-up',      icon: Clipboard,    label: '签约随访', color: 'var(--accent-purple)', bgColor: 'rgba(125,60,152,0.1)' },
   { path: '/resident/vaccine',        icon: Syringe,      label: '疫苗接种', color: 'var(--warn)', bgColor: 'rgba(230,126,34,0.1)' },
   { path: '/resident/family',         icon: Users,        label: '家庭成员', color: '#2980b9', bgColor: 'rgba(41,128,185,0.1)' },
   { path: '/resident/profile',        icon: UserRound,    label: '个人中心', color: 'var(--neutral-500)', bgColor: 'rgba(93,109,126,0.1)' },
 ]
+
+// 近期就诊（PC端右栏用）
+const recentVisits = ref([])
 
 function statusLabel(s) {
   return { 1: '待就诊', 2: '候诊中', 3: '就诊中', 4: '已完成', 5: '已取消' }[s] || '未知'
@@ -239,6 +260,12 @@ onMounted(async () => {
       const noticeRes = await request.get('/public/notice', { params: { page: 1, size: 3 } })
       notices.value = noticeRes.data?.records || []
     } catch { /* 静默 */ }
+
+    // PC端右栏：近期就诊记录
+    try {
+      const visitRes = await request.get('/resident/visit-record', { params: { page: 1, size: 3 } })
+      recentVisits.value = visitRes.data?.records || visitRes.data?.data?.records || []
+    } catch { /* 静默 */ }
   } catch (e) { console.warn(e) }
 })
 </script>
@@ -270,7 +297,14 @@ onMounted(async () => {
     grid-template-columns: repeat(7, 1fr) !important;
     gap: 8px !important;
   }
+  /* 桌面端显隐 */
+  .mobile-only { display: none !important; }
+  .desktop-only { display: block !important; }
 }
+
+/* 移动端默认显隐 */
+.mobile-only { display: block; }
+.desktop-only { display: none; }
 
 /* ── Hero 顶行 ── */
 .hero-top-row {
@@ -496,4 +530,14 @@ onMounted(async () => {
   vertical-align: middle;
   margin-left: 4px;
 }
+
+/* ── 近期就诊（PC右栏） ── */
+.visit-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.visit-item:last-child { border-bottom: none; }
+.vi-top { display: flex; justify-content: space-between; align-items: center; }
+.vi-bottom { margin-top: 4px; }
+.vi-complaint { font-size: 12px; color: var(--muted); }
 </style>

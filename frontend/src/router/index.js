@@ -34,6 +34,7 @@ const routes = [
       { path: 'visit-records', name: 'ResidentVisitRecords', component: () => import('@/views/resident/visit-record/VisitRecordPage.vue'), meta: { title: '就诊记录' } },
       { path: 'health-record', name: 'ResidentHealthRecord', component: () => import('@/views/resident/health-record/HealthRecordPage.vue'), meta: { title: '我的档案' } },
       { path: 'vaccine', name: 'ResidentVaccine', component: () => import('@/views/resident/vaccine/VaccinePage.vue'), meta: { title: '疫苗接种' } },
+      { path: 'follow-up', name: 'ResidentFollowUp', component: () => import('@/views/resident/followup/ResidentFollowUpPage.vue'), meta: { title: '签约与随访' } },
       { path: 'family', name: 'ResidentFamily', component: () => import('@/views/resident/family/FamilyPage.vue'), meta: { title: '家庭成员' } },
       { path: 'profile', name: 'ResidentProfile', component: () => import('@/views/resident/ProfilePage.vue'), meta: { title: '个人中心' } }
     ]
