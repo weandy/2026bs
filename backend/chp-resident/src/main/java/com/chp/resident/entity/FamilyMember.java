@@ -16,5 +16,6 @@ public class FamilyMember {
     private String idCard;
     private Long linkedResidentId;
     private Integer status;
+    private String permissionScope;
     private LocalDateTime createdAt;
 }
