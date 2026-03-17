@@ -211,16 +211,12 @@ onMounted(async () => {
     recentMsgs.value  = msgRes.data?.records   || msgRes.data?.data?.records  || []
     unreadCount.value = unreadRes.data?.count  || unreadRes.data?.data?.count  || 0
 
-    // 健康摘要（优雅降级）
-    try {
-      const healthRes = await request.get('/resident/health-record/summary')
-      healthSummary.value = healthRes.data || null
-    } catch { /* 接口不存在时静默 */ }
+    // 健康摘要数据：后端接口已取消，使用默认空数据 (或移除相关 UI 处理)
 
-    // A5: 加载社区公告
+    // A5: 加载社区公告 (使用免鉴权公共接口)
     try {
-      const noticeRes = await request.get('/admin/sys/notice', { params: { page: 1, size: 3 } })
-      notices.value = (noticeRes.data?.records || []).filter(n => n.status === 1)
+      const noticeRes = await request.get('/public/notice', { params: { page: 1, size: 3 } })
+      notices.value = noticeRes.data?.records || []
     } catch { /* 静默 */ }
   } catch (e) { console.warn(e) }
 })
