@@ -122,35 +122,20 @@ function toggleDark() {
 /* ── 导航配置 —— 侧边栏 & 移动端共用 ── */
 const medicalNav = computed(() => [
   { path: '/medical/workbench',     label: '接诊工作台', shortLabel: '工作台', icon: MonitorIcon },
-  { path: '/medical/prescription',  label: '处方管理',   shortLabel: '处方',   icon: FileText,
-    visible: userRole.value === 'doctor' || userRole.value === 'admin' },
-  { path: '/medical/record-manage', label: '档案管理',   shortLabel: '档案',   icon: FolderOpen },
-  { path: '/medical/follow-up',     label: '随访公卫',   shortLabel: '随访',   icon: ClipboardList },
-  { path: '/medical/dispense',      label: '药房发药',   shortLabel: '发药',   icon: Pill,
-    visible: userRole.value === 'nurse' || userRole.value === 'admin' },
+  { path: '/medical/record-manage', label: '居民档案',   shortLabel: '档案',   icon: FolderOpen },
+  { path: '/medical/follow-up',     label: '签约与随访', shortLabel: '随访',   icon: ClipboardList },
   { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe },
+  { path: '/medical/prescription',  label: '处方记录',   shortLabel: '处方',   icon: FileText },
   { path: '/medical/my-schedule',   label: '我的排班',   shortLabel: '排班',   icon: CalendarDays },
-  { path: '/medical/my-stats',      label: '工作量统计', shortLabel: '统计',   icon: BarChart3 },
-  { path: '/medical/referral',      label: '转诊管理',   shortLabel: '转诊',   icon: Repeat2 },
-  { path: '/medical/consultation',  label: '会诊管理',   shortLabel: '会诊',   icon: MessageSquare },
 ])
 
 const adminNav = computed(() => [
-  { path: '/admin/dashboard',         label: '管理首页',   shortLabel: '首页', icon: LayoutDashboard },
-  { path: '/admin/staff',             label: '用户管理',   shortLabel: '人员', icon: Users },
-  { path: '/admin/dept',              label: '科室管理',   shortLabel: '科室', icon: Building2 },
-  { path: '/admin/schedule',          label: '排班管理',   shortLabel: '排班', icon: CalendarDays },
-  { path: '/admin/schedule-transfer', label: '调班审批',   shortLabel: '调班', icon: ArrowLeftRight },
-  { path: '/admin/drug',              label: '药品库存',   shortLabel: '药品', icon: Stethoscope },
-  { path: '/admin/drug-log',          label: '出入库日志', shortLabel: '日志', icon: PackageSearch },
-  { path: '/admin/vaccine-stock',     label: '疫苗库存',   shortLabel: '疫苗', icon: Syringe },
-  { path: '/admin/dict',              label: '数据字典',   shortLabel: '字典', icon: BookOpen },
-  { path: '/admin/config',            label: '系统配置',   shortLabel: '配置', icon: Settings },
-  { path: '/admin/audit-log',         label: '审计日志',   shortLabel: '审计', icon: ScrollText },
-  { path: '/admin/resident',          label: '居民管理',   shortLabel: '居民', icon: UserSearch },
-  { path: '/admin/contract',          label: '签约管理',   shortLabel: '签约', icon: FileSignature },
-  { path: '/admin/article',           label: '文章管理',   shortLabel: '文章', icon: Newspaper },
-  { path: '/admin/performance',       label: '医生绩效',   shortLabel: '绩效', icon: Trophy },
+  { path: '/admin/dashboard',  label: '数据看板',   shortLabel: '看板', icon: LayoutDashboard },
+  { path: '/admin/staff',      label: '用户管理',   shortLabel: '人员', icon: Users },
+  { path: '/admin/schedule',   label: '排班管理',   shortLabel: '排班', icon: CalendarDays },
+  { path: '/admin/dept',       label: '科室管理',   shortLabel: '科室', icon: Building2 },
+  { path: '/admin/resident',   label: '居民管理',   shortLabel: '居民', icon: UserSearch },
+  { path: '/admin/contract',   label: '签约管理',   shortLabel: '签约', icon: FileSignature },
 ])
 
 const currentNav = computed(() => isAdmin.value ? adminNav.value : medicalNav.value)

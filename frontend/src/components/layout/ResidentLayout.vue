@@ -66,8 +66,8 @@ const userStore = useUserStore()
 const tabs = [
   { key: 'home', to: '/resident/home', label: '首页', icon: Home },
   { key: 'appointment', to: '/resident/appointment', label: '预约', icon: CalendarDays },
-  { key: 'health', to: '/resident/health-record', label: '档案', icon: FileText },
-  { key: 'message', to: '/resident/message', label: '消息', icon: Bell },
+  { key: 'visit', to: '/resident/visit-records', label: '就诊', icon: FileText },
+  { key: 'health', to: '/resident/health-record', label: '档案', icon: Bell },
   { key: 'profile', to: '/resident/profile', label: '我的', icon: UserRound },
 ]
 

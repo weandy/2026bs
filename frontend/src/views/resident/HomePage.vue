@@ -133,7 +133,7 @@ import { useUserStore } from '@/stores/user'
 import { useUiStore } from '@/stores/uiStore'
 import {
   CalendarDays, FileText, Clipboard, Syringe, Bell, UserRound,
-  Activity, AlertCircle, Users, Newspaper, ClipboardList
+  Activity, AlertCircle, Users, ClipboardList
 } from 'lucide-vue-next'
 
 const router    = useRouter()
@@ -177,15 +177,13 @@ const heroSub = computed(() => {
 })
 
 const shortcuts = [
-  { path: '/resident/appointment',   icon: CalendarDays, label: '预约挂号', color: 'var(--primary)', bgColor: 'rgba(47,107,87,0.1)' },
-  { path: '/resident/health-record', icon: FileText,     label: '健康档案', color: 'var(--medical)', bgColor: 'rgba(26,107,181,0.1)' },
-  { path: '/resident/visit-records', icon: Clipboard,    label: '就诊记录', color: 'var(--accent-purple)', bgColor: 'rgba(125,60,152,0.1)' },
-  { path: '/resident/vaccine',       icon: Syringe,      label: '疫苗接种', color: 'var(--warn)', bgColor: 'rgba(230,126,34,0.1)' },
-  { path: '/resident/family',        icon: Users,        label: '家庭成员', color: '#2980b9', bgColor: 'rgba(41,128,185,0.1)' },
-  { path: '/resident/article',       icon: Newspaper,    label: '健康资讯', color: '#27ae60', bgColor: 'rgba(39,174,96,0.1)' },
-  { path: '/resident/follow-up',     icon: ClipboardList,label: '我的随访', color: '#8e44ad', bgColor: 'rgba(142,68,173,0.1)' },
-  { path: '/resident/message',       icon: Bell,         label: '消息通知', color: 'var(--danger)', bgColor: 'rgba(192,57,43,0.1)' },
-  { path: '/resident/profile',       icon: UserRound,    label: '个人中心', color: 'var(--neutral-500)', bgColor: 'rgba(93,109,126,0.1)' },
+  { path: '/resident/appointment',    icon: CalendarDays, label: '预约挂号', color: 'var(--primary)', bgColor: 'rgba(47,107,87,0.1)' },
+  { path: '/resident/queue-progress', icon: Clipboard,    label: '候诊进度', color: 'var(--accent-purple)', bgColor: 'rgba(125,60,152,0.1)' },
+  { path: '/resident/visit-records',  icon: FileText,     label: '就诊记录', color: 'var(--medical)', bgColor: 'rgba(26,107,181,0.1)' },
+  { path: '/resident/health-record',  icon: ClipboardList,label: '我的档案', color: '#27ae60', bgColor: 'rgba(39,174,96,0.1)' },
+  { path: '/resident/vaccine',        icon: Syringe,      label: '疫苗接种', color: 'var(--warn)', bgColor: 'rgba(230,126,34,0.1)' },
+  { path: '/resident/family',         icon: Users,        label: '家庭成员', color: '#2980b9', bgColor: 'rgba(41,128,185,0.1)' },
+  { path: '/resident/profile',        icon: UserRound,    label: '个人中心', color: 'var(--neutral-500)', bgColor: 'rgba(93,109,126,0.1)' },
 ]
 
 function statusLabel(s) {
