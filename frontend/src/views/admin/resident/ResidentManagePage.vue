@@ -1,5 +1,5 @@
 <template>
-  <div class="resident-manage"><div class="page-header"><h2>居民管理</h2></div>
+  <div class="resident-manage">
     <el-form :inline="true" class="filter-bar">
       <el-form-item><el-input v-model="keyword" placeholder="姓名/手机号/身份证" clearable @keyup.enter="load" /></el-form-item>
       <el-form-item><el-button type="primary" @click="load">搜索</el-button></el-form-item>

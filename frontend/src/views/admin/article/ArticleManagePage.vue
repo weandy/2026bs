@@ -1,5 +1,5 @@
 <template>
-  <div class="article-manage"><div class="page-header"><h2>文章管理</h2><el-button type="primary" @click="openForm()">新建文章</el-button></div>
+  <div class="article-manage"><div class="toolbar-bar"><el-button type="primary" @click="openForm()">新建文章</el-button></div>
     <el-table :data="records" stripe border v-loading="loading">
       <el-table-column prop="title" label="标题" />
       <el-table-column prop="category" label="分类" width="80">

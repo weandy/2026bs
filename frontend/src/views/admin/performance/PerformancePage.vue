@@ -1,5 +1,5 @@
 <template>
-  <div class="performance-page"><div class="page-header"><h2>医生绩效</h2></div>
+  <div class="performance-page">
     <el-table :data="records" stripe border v-loading="loading">
       <el-table-column prop="staffName" label="医生" width="100" />
       <el-table-column prop="deptName" label="科室" width="120" />

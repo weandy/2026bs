@@ -4,14 +4,14 @@
       <h2>就诊记录</h2>
     </div>
 
-    <!-- 筛选条件 -->
     <el-form :inline="true" class="filter-section">
       <el-form-item label="状态">
-        <el-select v-model="filterStatus" clearable placeholder="全部" @change="loadRecords">
-          <el-option label="就诊中" :value="1" />
-          <el-option label="已完成" :value="2" />
-          <el-option label="已取消" :value="3" />
-        </el-select>
+        <el-radio-group v-model="filterStatus" @change="loadRecords">
+          <el-radio-button :value="null">全部</el-radio-button>
+          <el-radio-button :value="1">就诊中</el-radio-button>
+          <el-radio-button :value="2">已完成</el-radio-button>
+          <el-radio-button :value="3">已取消</el-radio-button>
+        </el-radio-group>
       </el-form-item>
     </el-form>
 
@@ -23,10 +23,11 @@
                  :class="{ selected: detailRecord?.id === record.id }"
                  @click="showDetail(record)">
           <div class="record-header">
-            <span class="visit-no">{{ record.visitNo || ('VR' + record.id) }}</span>
+            <span class="record-time">{{ formatDate(record.visitDate || record.createdAt) }}</span>
             <el-tag :type="statusType(record.status)" size="small">{{ statusText(record.status) }}</el-tag>
           </div>
           <div class="record-body">
+            <div class="visit-no-row">{{ record.visitNo || ('VR' + record.id) }}</div>
             <div>科室：{{ record.deptName }} | 医生：{{ record.staffName }}</div>
             <div>主诉：{{ record.chiefComplaint || '—' }}</div>
             <div v-if="record.diagnosisNames" style="color:var(--info)">诊断：{{ record.diagnosisNames }}</div>

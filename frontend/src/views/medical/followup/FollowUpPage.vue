@@ -32,16 +32,16 @@
           <el-button type="primary" size="small" @click="showPlanDialog = true">新建计划</el-button>
         </div>
       </template>
-      <el-form :inline="true" @submit.prevent="loadPlans">
+      <el-form :inline="true">
         <el-form-item label="慢病类型">
-          <el-select v-model="chronicFilter" clearable placeholder="全部">
-            <el-option label="高血压" value="hypertension" />
-            <el-option label="糖尿病" value="diabetes" />
-            <el-option label="冠心病" value="chd" />
-          </el-select>
+          <el-radio-group v-model="chronicFilter" @change="loadPlans">
+            <el-radio-button value="">全部</el-radio-button>
+            <el-radio-button value="hypertension">高血压</el-radio-button>
+            <el-radio-button value="diabetes">糖尿病</el-radio-button>
+            <el-radio-button value="chd">冠心病</el-radio-button>
+          </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadPlans">查询</el-button>
           <el-button @click="loadTodayDue">今日到期</el-button>
         </el-form-item>
       </el-form>
@@ -81,15 +81,15 @@
           <el-button type="primary" size="small" @click="showPhDialog = true">新建记录</el-button>
         </div>
       </template>
-      <el-form :inline="true" @submit.prevent="loadPh">
+      <el-form :inline="true">
         <el-form-item label="服务类型">
-          <el-select v-model="phTypeFilter" clearable placeholder="全部">
-            <el-option label="老年人体检" value="elder_exam" />
-            <el-option label="产前检查" value="prenatal" />
-            <el-option label="儿童保健" value="child_care" />
-          </el-select>
+          <el-radio-group v-model="phTypeFilter" @change="loadPh">
+            <el-radio-button value="">全部</el-radio-button>
+            <el-radio-button value="elder_exam">老年人体检</el-radio-button>
+            <el-radio-button value="prenatal">产前检查</el-radio-button>
+            <el-radio-button value="child_care">儿童保健</el-radio-button>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item><el-button type="primary" @click="loadPh">查询</el-button></el-form-item>
       </el-form>
       <el-table :data="phRecords" stripe v-loading="phLoading">
         <el-table-column prop="residentName" label="居民" width="100" />
