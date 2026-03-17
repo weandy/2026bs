@@ -1,5 +1,29 @@
 <template>
   <div class="follow-up-page">
+    <!-- 签约居民 -->
+    <el-card shadow="never" style="margin-bottom:16px">
+      <template #header>
+        <div class="card-header">
+          <span>我的签约居民</span>
+          <el-tag size="small" type="info">{{ myResidents.length }} 人</el-tag>
+        </div>
+      </template>
+      <div v-if="myResidents.length === 0" style="color:var(--el-text-color-secondary);text-align:center;padding:12px 0;">暂无签约居民</div>
+      <el-table v-else :data="myResidents" stripe size="small">
+        <el-table-column prop="residentId" label="居民ID" width="80" />
+        <el-table-column prop="teamName" label="团队" />
+        <el-table-column prop="startDate" label="签约日期" width="110" />
+        <el-table-column prop="endDate" label="到期日期" width="110" />
+        <el-table-column label="剩余天数" width="100">
+          <template #default="{ row }">
+            <span :style="{ color: daysLeft(row.endDate) <= 30 ? '#e74c3c' : '' }">
+              {{ daysLeft(row.endDate) }} 天
+            </span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
     <!-- 随访计划 -->
     <el-card shadow="never" style="margin-bottom:16px">
       <template #header>
@@ -340,7 +364,20 @@ const createPh = async () => {
   loadPh()
 }
 
-onMounted(() => { loadPlans(); loadPh() })
+// 签约居民
+const myResidents = ref([])
+async function loadMyResidents() {
+  try {
+    const { data } = await request.get('/medical/contract/my-residents')
+    myResidents.value = data || []
+  } catch {}
+}
+function daysLeft(endDate) {
+  if (!endDate) return 0
+  return Math.max(0, Math.ceil((new Date(endDate) - new Date()) / 86400000))
+}
+
+onMounted(() => { loadPlans(); loadPh(); loadMyResidents() })
 </script>
 
 <style scoped>

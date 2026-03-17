@@ -26,6 +26,11 @@
 
 9.医护端的健康档案管理里面也要支持混合查询，同时也要有列表显示，列表也要支持翻页。同时医护端访问http://localhost:5173/api/admin/drug?page=1&size=500报错状态码500
 
-10.管理端的数据看板页面的http://localhost:5173/api/admin/report/doctor-workload这个报错404，而且没必要显示
+10.管理端的数据看板页面的http://localhost:5173/api/admin/report/doctor-workload这个报错404，而且没必要显示/html/body/div[1]/section/section/main/div/div[4]/div[2]/div这个内容，就是药品消耗量top5，因为我们现有的模块里面好像删除了药品相关的功能，包括库存预警概览这个内容，剩下的内容那你就要进行合理的排布和优化显示了
+
+11.管理端的用户管理感觉有歧义，毕竟下面还有一个居民管理，所以看看能不能优化一下名称显示，然后里面的重置密码应该是只能重置一个临时的密码，然后用户使用这个密码登录之后，都要进行强制的修改的，这个对于居民管理端也是一样的
+12.<div data-v-ba14a740="" class="page-header"><h2 data-v-ba14a740="">居民管理</h2></div>
+<span data-v-6ebe203e="" class="page-title">居民管理</span>
+你有没有感觉管理端的这种xian'shi
 
 我们应该产生一些模拟的数据，这样方便我们进一步的进行优化设计，在产生这些模拟数据的时候你一定注意产生数据的影响，要考虑三个角色端影响

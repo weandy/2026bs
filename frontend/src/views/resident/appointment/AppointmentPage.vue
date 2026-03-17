@@ -89,6 +89,7 @@
             <div v-for="sch in schedules" :key="sch.id" class="doctor-card">
               <div class="doctor-header">
                 <strong>{{ sch.staffName }}</strong>
+                <span v-if="contractDoctorId && sch.staffId === contractDoctorId" class="contract-badge">我的家庭医生</span>
                 <span class="status-tag done" v-if="slotsMap[sch.id] && slotsMap[sch.id].filter(s => s.remaining > 0).length > 0">
                   可预约
                 </span>
@@ -235,6 +236,7 @@ const schedules = ref([])
 const slotsMap = ref({})
 const selectedSchedule = ref(null)
 const selectedSlot = ref(null)
+const contractDoctorId = ref(null)
 const submitting = ref(false)
 const formRef = ref()
 const createdAppt = ref({})
@@ -274,10 +276,17 @@ const rules = {
   ]
 }
 
-function selectDept(dept) {
+async function selectDept(dept) {
   selectedDept.value = dept
   step.value = 2
   loadSchedules() // 自动加载今天的排班
+  // 加载签约信息
+  try {
+    const cRes = await request.get('/resident/follow-up/contract')
+    if (cRes.data && cRes.data.status === 'ACTIVE') {
+      contractDoctorId.value = cRes.data.doctorId
+    }
+  } catch {}
 }
 
 function disabledDate(date) {
@@ -301,6 +310,14 @@ async function loadSchedules() {
       params: { deptCode: selectedDept.value.code, date: dateStr }
     })
     schedules.value = res.data || []
+    // Step 6: 签约医生置顶
+    if (contractDoctorId.value) {
+      schedules.value.sort((a, b) => {
+        const aIsContract = a.staffId === contractDoctorId.value ? 0 : 1
+        const bIsContract = b.staffId === contractDoctorId.value ? 0 : 1
+        return aIsContract - bIsContract
+      })
+    }
     for (const sch of schedules.value) {
       const slotRes = await request.get(`/resident/appointment/slots/${sch.id}`)
       slotsMap.value[sch.id] = slotRes.data || []
@@ -451,6 +468,10 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 .doctor-header strong { font-size: 15px; color: var(--text-strong); }
+.contract-badge {
+  font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600;
+  background: rgba(47,107,87,0.12); color: var(--primary);
+}
 
 /* 时段格子 */
 .slot-list {

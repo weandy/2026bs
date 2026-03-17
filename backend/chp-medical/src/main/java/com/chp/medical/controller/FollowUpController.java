@@ -12,6 +12,11 @@ import com.chp.common.annotation.AuditLog;
 
 import java.util.List;
 
+import com.chp.admin.entity.FamilyDoctorContract;
+import com.chp.admin.mapper.FamilyDoctorContractMapper;
+import com.chp.security.util.SecurityUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 @RestController
 @RequestMapping("/medical")
 @RequiredArgsConstructor
@@ -75,6 +80,20 @@ public class FollowUpController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String serviceType) {
         return Result.success(followUpService.publicHealthPage(page, size, serviceType));
+    }
+    private final FamilyDoctorContractMapper contractMapper;
+
+    // ===== 签约居民 =====
+
+    @GetMapping("/contract/my-residents")
+    public Result<List<FamilyDoctorContract>> myResidents() {
+        Long doctorId = SecurityUtils.getCurrentUserId();
+        List<FamilyDoctorContract> list = contractMapper.selectList(
+                new LambdaQueryWrapper<FamilyDoctorContract>()
+                        .eq(FamilyDoctorContract::getDoctorId, doctorId)
+                        .eq(FamilyDoctorContract::getStatus, "ACTIVE")
+                        .orderByAsc(FamilyDoctorContract::getEndDate));
+        return Result.success(list);
     }
 
     @PostMapping("/public-health")
