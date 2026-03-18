@@ -17,5 +17,8 @@ public class FamilyMember {
     private Long linkedResidentId;
     private Integer status;
     private String permissionScope;
+    private java.time.LocalDate birthDate;
+    private Integer gender;
+    private String remark;
     private LocalDateTime createdAt;
 }

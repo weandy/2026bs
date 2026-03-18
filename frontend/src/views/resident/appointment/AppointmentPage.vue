@@ -156,8 +156,28 @@
           <!-- 左：表单 -->
           <div class="panel list-panel">
             <div class="panel-header"><span class="panel-title">填写就诊人信息</span></div>
+
+            <!-- 为谁预约（家庭成员联动） -->
+            <div v-if="familyMembers.length > 0" class="proxy-selector">
+              <span class="proxy-label">为谁预约</span>
+              <div class="proxy-options">
+                <button
+                  :class="['proxy-opt', !proxyMember ? 'active' : '']"
+                  @click="proxyMember = null; form.patientName = selfName"
+                >本人</button>
+                <button
+                  v-for="m in familyMembers" :key="m.id"
+                  :class="['proxy-opt', proxyMember?.id === m.id ? 'active' : '']"
+                  @click="proxyMember = m; form.patientName = m.memberName"
+                >
+                  {{ m.memberName }}
+                  <span class="proxy-relation">{{ { spouse:'配偶', child:'子女', parent:'父母', grandparent:'祖父母', other:'其他' }[m.relation] || m.relation }}</span>
+                </button>
+              </div>
+            </div>
+
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
-              <el-form-item label="真实姓名" prop="patientName">
+              <el-form-item label="就诊人姓名" prop="patientName">
                 <el-input v-model="form.patientName" placeholder="请填写就诊人姓名" data-testid="input-patient-name" />
               </el-form-item>
               <el-form-item label="联系手机号" prop="patientPhone">
@@ -240,10 +260,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 import { Building2, Calendar, Clock, Ghost, CheckCircle2 } from 'lucide-vue-next'
 
+const route = useRoute()
 const step = ref(1)
 const mode = ref('history') // 默认进入历史记录，更符合高频直觉
 const selectedDept = ref(null)
@@ -260,6 +282,30 @@ const submitting = ref(false)
 const formRef = ref()
 const createdAppt = ref({})
 const departments = ref([])
+
+// ── 家庭成员代为预约 ──
+const familyMembers = ref([])    // 可代为预约的家庭成员列表
+const proxyMember = ref(null)    // 当前选择的代管成员（null = 本人）
+
+async function loadFamilyMembers() {
+  try {
+    const { data } = await request.get('/resident/family')
+    // 只展示有 appointment 权限的成员
+    familyMembers.value = (data || []).filter(m =>
+      (m.permissionScope || '').includes('appointment')
+    )
+    // 若从 FamilyPage 跳转过来，自动预选成员
+    const proxyId = route.query.proxyId
+    if (proxyId) {
+      const found = familyMembers.value.find(m => String(m.id) === String(proxyId))
+      if (found) {
+        proxyMember.value = found
+        mode.value = 'new'   // 直接进入新建预约
+        step.value = 1
+      }
+    }
+  } catch { familyMembers.value = [] }
+}
 
 const steps = ['选择科室', '排班时段', '就诊信息', '完成预约']
 
@@ -377,7 +423,9 @@ async function submitAppointment() {
       timePeriod: selectedSlot.value.timePeriod,
       patientName: form.patientName,
       patientPhone: form.patientPhone,
-      symptomDesc: form.symptomDesc
+      symptomDesc: form.symptomDesc,
+      // 家庭成员代为预约
+      proxyMemberId: proxyMember.value?.id || null
     })
     createdAppt.value = res.data
     step.value = 4
@@ -411,16 +459,21 @@ async function cancelAppt(id) {
   }
 }
 
+// 记录本人姓名（切换回本人时恢复）
+const selfName = ref('')
+
 onMounted(() => {
   loadDepartments()
   loadHistory()
-  
+  loadFamilyMembers()
+
   // 注入已登录用户的默认数据以方便体验
   const tryUser = localStorage.getItem('userInfo')
   if (tryUser) {
     try {
       const u = JSON.parse(tryUser)
       form.patientName = u.name || ''
+      selfName.value = u.name || ''
       form.patientPhone = u.phone || ''
     } catch(e){}
   }
@@ -429,6 +482,20 @@ onMounted(() => {
 
 <style scoped>
 .appointment-page { padding: 16px; max-width: 100%; margin: 0 auto; }
+
+/* 为谁预约 */
+.proxy-selector { margin-bottom: 16px; padding: 12px 16px; background: var(--surface-soft); border-radius: 12px; border: 1px solid var(--border); }
+.proxy-label { font-size: 12px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px; }
+.proxy-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.proxy-opt {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); cursor: pointer; font-size: 13px; font-family: var(--font-sans);
+  color: var(--text); transition: .2s;
+}
+.proxy-opt:hover { border-color: var(--primary); }
+.proxy-opt.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.proxy-relation { font-size: 11px; opacity: .7; margin-left: 4px; }
+
 
 /* ══ PC 桌面端 (≥ 768px) ══ */
 @media (min-width: 768px) {
