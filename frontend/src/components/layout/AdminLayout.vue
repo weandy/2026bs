@@ -139,7 +139,7 @@ const medicalNav = computed(() => [
 const adminNav = computed(() => [
   { group: '核心管理' },
   { path: '/admin/dashboard',  label: '数据看板',   shortLabel: '看板', icon: LayoutDashboard },
-  { path: '/admin/staff',      label: '用户管理',   shortLabel: '人员', icon: Users },
+  { path: '/admin/staff',      label: '医护管理',   shortLabel: '人员', icon: Users },
   { path: '/admin/resident',   label: '居民管理',   shortLabel: '居民', icon: UserSearch },
   { path: '/admin/contract',   label: '签约管理',   shortLabel: '签约', icon: FileSignature },
   { group: '运营配置' },
