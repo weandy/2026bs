@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="health-record-page">
     <!-- 头部：使用全局 page-header 类 -->
     <div class="page-header">
@@ -174,19 +174,24 @@ const glucoseLevel = computed(() => {
 async function downloadPdf() {
   pdfLoading.value = true
   try {
-    const res = await request.get('/resident/health-summary/pdf', {
-      responseType: 'blob'
+    // 绕过 request.js 全局拦截器（拦截器执行 return response.data，
+    // 导致 responseType:'blob' 时返回裸 Blob，再次 new Blob([blob]) 会
+    // 二次包装导致内容损坏，Chrome 无法识别文件类型，用 UUID 命名）
+    const axiosLib = (await import('axios')).default
+    const token = localStorage.getItem('accessToken')
+    const response = await axiosLib.get('/api/resident/health-summary/pdf', {
+      responseType: 'blob',
+      headers: { Authorization: `Bearer ${token}` }
     })
-    const blob = new Blob([res.data || res], { type: 'application/pdf' })
-    const url = window.URL.createObjectURL(blob)
+    // response.data 是原始 Blob，直接使用，不再套一层 new Blob()
+    const url = window.URL.createObjectURL(response.data)
     const a = document.createElement('a')
     a.href = url
-    // 动态拼接文件名：用户名_日期.pdf
     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
     const userName = userInfo.name || userInfo.username || '居民'
     const today = new Date().toISOString().slice(0, 10)
     a.download = `${userName}_${today}.pdf`
-    // 必须挂载到 DOM，Chrome 才能正确识别 download 属性
+    // 挂载到 DOM 确保 Chrome 正确识别 download 属性
     a.style.display = 'none'
     document.body.appendChild(a)
     a.click()
