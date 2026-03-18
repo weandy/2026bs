@@ -24,3 +24,9 @@ spring:
         maximum-pool-size: 10
         minimum-idle: 5
         connection-timeout: 30000
+
+# ── 本地开发 JWT 明确配置（覆盖 application.yml 中的占位符）──
+jwt:
+  secret: chp-community-health-platform-jwt-secret-key-2024-dev
+  access-token-expiration: 7200000
+  refresh-token-expiration: 604800000

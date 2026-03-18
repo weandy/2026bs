@@ -138,13 +138,20 @@ const medicalNav = computed(() => [
 
 const adminNav = computed(() => [
   { group: '核心管理' },
-  { path: '/admin/dashboard',  label: '数据看板',   shortLabel: '看板', icon: LayoutDashboard },
-  { path: '/admin/staff',      label: '医护管理',   shortLabel: '人员', icon: Users },
-  { path: '/admin/resident',   label: '居民管理',   shortLabel: '居民', icon: UserSearch },
-  { path: '/admin/contract',   label: '签约管理',   shortLabel: '签约', icon: FileSignature },
+  { path: '/admin/dashboard',     label: '数据看板',     shortLabel: '看板', icon: LayoutDashboard },
+  { path: '/admin/staff',         label: '医护管理',     shortLabel: '人员', icon: Users },
+  { path: '/admin/resident',      label: '居民管理',     shortLabel: '居民', icon: UserSearch },
+  { path: '/admin/contract',      label: '签约管理',     shortLabel: '签约', icon: FileSignature },
+  { group: '公告与通知' },
+  { path: '/admin/notice',        label: '公告管理',     shortLabel: '公告', icon: Newspaper },
   { group: '运营配置' },
-  { path: '/admin/schedule',   label: '排班管理',   shortLabel: '排班', icon: CalendarDays },
-  { path: '/admin/dept',       label: '科室管理',   shortLabel: '科室', icon: Building2 },
+  { path: '/admin/schedule',      label: '排班管理',     shortLabel: '排班', icon: CalendarDays },
+  { path: '/admin/dept',          label: '科室管理',     shortLabel: '科室', icon: Building2 },
+  { group: '物资管理' },
+  { path: '/admin/drug',          label: '药品库存',     shortLabel: '药品', icon: Pill },
+  { path: '/admin/vaccine-stock', label: '疫苗库存',     shortLabel: '疫苗', icon: Syringe },
+  { group: '系统管理' },
+  { path: '/admin/audit-log',     label: '操作日志',     shortLabel: '日志', icon: ScrollText },
 ])
 
 const currentNav = computed(() => isAdmin.value ? adminNav.value : medicalNav.value)

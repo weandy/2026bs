@@ -12,7 +12,9 @@ public class Article {
     private String title;
     private String coverUrl;
     private String content;
+    private String summary;      // 摘要
     private String category;
+    private String audience;     // 目标受众: all/resident/staff
     private String authorName;
     private Integer viewCount;
     private Integer isPublished;
