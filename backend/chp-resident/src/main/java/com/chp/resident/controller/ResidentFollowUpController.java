@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -90,16 +89,19 @@ public class ResidentFollowUpController {
     /** 可签约医生列表（按科室） */
     @GetMapping("/doctors")
     public Result<?> availableDoctors(@RequestParam(required = false) String deptCode) {
-        String sql = "SELECT u.id AS doctorId, u.name AS doctorName, u.dept_code AS deptCode, " +
+        String sql = "SELECT s.id AS doctorId, s.name AS doctorName, s.dept_code AS deptCode, " +
                 "d.dept_name AS deptName, " +
-                "(SELECT COUNT(*) FROM family_doctor_contract fdc WHERE fdc.doctor_id = u.id AND fdc.status = 'ACTIVE') AS contractCount " +
-                "FROM sys_user u LEFT JOIN sys_dept d ON u.dept_code = d.dept_code " +
-                "WHERE u.role = 'DOCTOR' AND u.status = 1";
+                "(SELECT COUNT(*) FROM family_doctor_contract fdc WHERE fdc.doctor_id = s.id AND fdc.status = 'ACTIVE') AS contractCount " +
+                "FROM chp_admin.staff s LEFT JOIN chp_admin.dept d ON s.dept_code = d.dept_code " +
+                "WHERE s.role_code = 'DOCTOR' AND s.status = 1";
+        List<Map<String, Object>> doctors;
         if (deptCode != null && !deptCode.isBlank()) {
-            sql += " AND u.dept_code = '" + deptCode + "'";  // 简化处理
+            sql += " AND s.dept_code = ? ORDER BY contractCount ASC";
+            doctors = jdbcTemplate.queryForList(sql, deptCode);
+        } else {
+            sql += " ORDER BY contractCount ASC";
+            doctors = jdbcTemplate.queryForList(sql);
         }
-        sql += " ORDER BY contractCount ASC";
-        List<Map<String, Object>> doctors = jdbcTemplate.queryForList(sql);
         return Result.success(doctors);
     }
 
