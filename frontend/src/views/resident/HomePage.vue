@@ -177,20 +177,23 @@ const heroTitle = computed(() => {
   return '社区卫生服务中心'
 })
 
-const heroSub = computed(() => {
-  const msgs = unreadCount.value
-  const appts = recentAppts.value.length
-  const nts = notices.value.length
+/* ── 待就诊预约（状态1=待就诊, 2=候诊中），与今日提醒保持一致 ── */
+const pendingAppts = computed(() =>
+  recentAppts.value.filter(a => a.status === 1 || a.status === 2)
+)
 
-  if (msgs > 0 || appts > 0) {
+const heroSub = computed(() => {
+  const appts = pendingAppts.value.length
+  const msgs  = unreadCount.value
+  const nts   = notices.value.length
+
+  if (appts > 0 || msgs > 0) {
     const parts = []
     if (appts > 0) parts.push(`${appts} 个待就诊预约`)
-    if (msgs > 0) parts.push(`${msgs} 条未读消息`)
+    if (msgs  > 0) parts.push(`${msgs} 条未读消息`)
     return `您有 ${parts.join('，')}，请及时查看`
   }
-  if (nts > 0) {
-    return `您有 ${nts} 条社区公告待查看`
-  }
+  if (nts > 0) return `您有 ${nts} 条社区公告待查看`
   return '预约挂号、健康档案和就诊记录可在首页快捷进入'
 })
 
@@ -217,12 +220,11 @@ function chronicLabel(c) {
   return { hypertension: '高血压', diabetes: '糖尿病', chd: '冠心病', copd: '慢阻肺', stroke: '脑卒中' }[c] || c
 }
 
-/* ── 今日提醒（从预约和消息中提炼） ── */
+/* ── 今日提醒（复用 pendingAppts，与 Hero 保持一致） ── */
 const reminders = computed(() => {
   const list = []
-  const upcoming = recentAppts.value.filter(a => a.status === 1 || a.status === 2)
-  if (upcoming.length > 0) {
-    list.push({ icon: CalendarDays, text: `您有 ${upcoming.length} 个待就诊预约` })
+  if (pendingAppts.value.length > 0) {
+    list.push({ icon: CalendarDays, text: `您有 ${pendingAppts.value.length} 个待就诊预约` })
   }
   if (unreadCount.value > 0) {
     list.push({ icon: Bell, text: `${unreadCount.value} 条未读消息` })
