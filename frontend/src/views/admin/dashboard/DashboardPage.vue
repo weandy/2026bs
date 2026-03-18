@@ -1,19 +1,31 @@
 <template>
   <div class="dashboard">
-
-    <!-- 页面头部 —— 标题由 AdminLayout topbar 提供，此处仅保留副标题与操作按钮 -->
+    <!-- 页面头部 -->
     <div class="page-header">
-      <p class="page-subtitle">{{ todayStr }} · 数据概览</p>
-      <el-button type="success" size="small" :loading="exporting" @click="exportReport">
-        <PackageSearch :size="14" style="margin-right:4px" /> 导出报表
-      </el-button>
+      <p class="page-subtitle">数据概览</p>
+      <div class="header-actions">
+        <!-- 日期范围选择器 -->
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          size="small"
+          :disabledDate="(d) => d > new Date()"
+          value-format="YYYY-MM-DD"
+          style="width: 240px; margin-right: 8px;"
+          @change="onDateRangeChange"
+        />
+        <el-button type="success" size="small" :loading="exporting" @click="exportReport">
+          <PackageSearch :size="14" style="margin-right:4px" /> 导出报表
+        </el-button>
+      </div>
     </div>
 
-
-    <!-- 指标卡 -->
+    <!-- 指标卡（累计数据，无日期限制） -->
     <div class="summary-grid">
-      <div v-for="card in statCards" :key="card.label"
-        :class="['metric-card-v2', card.cls]">
+      <div v-for="card in statCards" :key="card.label" :class="['metric-card-v2', card.cls]">
         <div class="mc-label">{{ card.label }}</div>
         <div class="mc-value">{{ card.value }}</div>
         <div class="mc-trend" v-if="card.hint">{{ card.hint }}</div>
@@ -24,13 +36,19 @@
     <el-row :gutter="16" class="chart-row">
       <el-col :xs="24" :sm="14">
         <div class="panel">
-          <h4>近7天就诊趋势</h4>
+          <h4 class="panel-title-row">
+            <span>{{ trendTitle }}</span>
+            <span class="panel-date-hint">{{ dateRangeLabel }}</span>
+          </h4>
           <v-chart :option="trendOption" style="height: 280px;" autoresize />
         </div>
       </el-col>
       <el-col :xs="24" :sm="10">
         <div class="panel">
-          <h4>科室就诊分布</h4>
+          <h4 class="panel-title-row">
+            <span>科室就诊分布</span>
+            <span class="panel-date-hint">{{ dateRangeLabel }}</span>
+          </h4>
           <v-chart :option="pieOption" style="height: 280px;" autoresize />
         </div>
       </el-col>
@@ -64,7 +82,7 @@
         <div class="panel">
           <h4>随访完成率</h4>
           <div class="panel-scroll-body" style="max-height:220px">
-            <div class="list-row"><span>本月随访计划</span><strong>{{ followUpStats.total || 0 }}</strong></div>
+            <div class="list-row"><span>进行中计划</span><strong>{{ followUpStats.total || 0 }}</strong></div>
             <div class="list-row"><span>已完成</span><strong class="text-good">{{ followUpStats.completed || 0 }}</strong></div>
             <div class="list-row"><span>逾期未访</span><strong class="text-danger">{{ followUpStats.overdue || 0 }}</strong></div>
           </div>
@@ -76,9 +94,12 @@
     <el-row :gutter="16" class="chart-row">
       <el-col :xs="24" :sm="12">
         <div class="panel">
-          <h4>今日接诊概况 <el-tag v-if="todaySummary.estimated" size="small" type="warning" style="margin-left:6px">估算</el-tag></h4>
+          <h4 class="panel-title-row">
+            <span>接诊概况</span>
+            <span class="panel-date-hint">{{ summaryDateLabel }}</span>
+          </h4>
           <div class="panel-scroll-body" style="max-height:220px">
-            <div class="list-row"><span>今日挂号总量</span><strong>{{ todaySummary.totalAppt }}</strong></div>
+            <div class="list-row"><span>预约挂号总量</span><strong>{{ todaySummary.totalAppt }}</strong></div>
             <div class="list-row"><span>已完成就诊</span><strong class="text-good">{{ todaySummary.completed }}</strong></div>
             <div class="list-row"><span>候诊中</span><strong class="text-warn">{{ todaySummary.waiting }}</strong></div>
             <div class="list-row"><span>爽约/取消</span><strong class="text-muted">{{ todaySummary.cancelled }}</strong></div>
@@ -87,7 +108,11 @@
       </el-col>
       <el-col :xs="24" :sm="12">
         <div class="panel">
-          <h4>医生工作量排行 (本周) <el-tag v-if="isDemoRank" size="small" type="info" style="margin-left:6px">演示</el-tag></h4>
+          <h4 class="panel-title-row">
+            <span>医生工作量排行</span>
+            <span class="panel-date-hint">{{ dateRangeLabel }}</span>
+            <el-tag v-if="isDemoRank" size="small" type="info" style="margin-left:6px">演示</el-tag>
+          </h4>
           <div class="panel-scroll-body" style="max-height:220px">
             <el-empty v-if="doctorRank.length === 0" description="暂无数据" :image-size="40" />
             <div v-for="(doc, idx) in doctorRank" :key="doc.name" class="rank-row">
@@ -99,135 +124,200 @@
         </div>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import request from '@/utils/request'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart, PieChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent, TitleComponent } from 'echarts/components'
-import { PackageSearch, TriangleAlert } from 'lucide-vue-next'
+import { PackageSearch } from 'lucide-vue-next'
 
 use([CanvasRenderer, BarChart, LineChart, PieChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent])
 
-const todayStr = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+// ────────────────────────────────────────────────
+// 日期范围（默认: 今天-6 ~ 今天）
+// ────────────────────────────────────────────────
+const today = new Date()
+const fmt = (d) => d.toISOString().slice(0, 10)
+const defaultStart = fmt(new Date(today.getTime() - 6 * 86400000))
+const defaultEnd   = fmt(today)
+const dateRange = ref([defaultStart, defaultEnd])
 
+const dateRangeLabel = computed(() => {
+  if (!dateRange.value?.length) return ''
+  const [s, e] = dateRange.value
+  if (s === e) return s.slice(5)
+  return `${s.slice(5)} ~ ${e.slice(5)}`
+})
+
+const trendTitle = computed(() => {
+  if (!dateRange.value?.length) return '就诊趋势'
+  const [s, e] = dateRange.value
+  const days = Math.round((new Date(e) - new Date(s)) / 86400000) + 1
+  return `近 ${days} 天就诊趋势`
+})
+
+// 摘要日期：用结束日（或今日）
+const summaryDate = computed(() => dateRange.value?.[1] || defaultEnd)
+const summaryDateLabel = computed(() => summaryDate.value?.slice(5))
+
+// ────────────────────────────────────────────────
+// 响应式数据
+// ────────────────────────────────────────────────
 const statCards = ref([
   { label: '签约人数', value: '-', cls: 'mc-success', hint: '当前生效签约' },
-  { label: '随访计划', value: '-', cls: 'mc-primary', hint: '进行中计划' },
-  { label: '员工总数', value: '-', cls: 'mc-warn',    hint: '' },
-  { label: '系统公告', value: '-', cls: 'mc-danger',  hint: '' }
+  { label: '随访计划', value: '-', cls: 'mc-primary', hint: '进行中计划'  },
+  { label: '员工总数', value: '-', cls: 'mc-warn',    hint: ''            },
+  { label: '系统公告', value: '-', cls: 'mc-danger',  hint: ''            },
+  { label: '今日预约', value: '-', cls: 'mc-info',    hint: '今日预约总量'  }
 ])
 
-const todaySummary = ref({ totalAppt: 0, completed: 0, waiting: 0, cancelled: 0, estimated: false })
-const doctorRank = ref([])
-const isDemoRank = ref(false)
-
+const todaySummary  = ref({ totalAppt: 0, completed: 0, waiting: 0, cancelled: 0 })
+const doctorRank    = ref([])
+const isDemoRank    = ref(false)
 const contractStats = ref({ active: 0, newThisMonth: 0, pending: 0 })
-const followUpStats = ref({ total: 0, completed: 0, overdue: 0 })
-const notices = ref([])
-const exporting = ref(false)
-const trendOption = ref({})
-const pieOption = ref({})
-const barOption = ref({})
+const followUpStats = ref({ total: 0,  completed: 0,    overdue: 0 })
+const notices       = ref([])
+const exporting     = ref(false)
+const trendOption   = ref({})
+const pieOption     = ref({})
 
-function formatDate(dt) {
-  return dt ? new Date(dt).toLocaleDateString('zh-CN') : ''
-}
+// ────────────────────────────────────────────────
+// 核心图表调用（支持日期范围）
+// ────────────────────────────────────────────────
+async function loadCharts(startDate, endDate) {
+  const params = { startDate, endDate }
 
-onMounted(async () => {
+  // 近 N 天就诊趋势
   try {
-    const overview = await request.get('/admin/report/overview')
-    const d = overview.data || {}
-
-    const staffRes = await request.get('/admin/staff', { params: { page: 1, size: 1 } })
-    statCards.value[2].value = staffRes.data?.total ?? '-'
-
-    const noticeRes = await request.get('/admin/notice', { params: { page: 1, size: 5 } })
-    notices.value = noticeRes.data?.records || []
-    statCards.value[3].value = noticeRes.data?.total ?? '-'
-
-    // 签约统计
-    try {
-      const cRes = await request.get('/admin/report/contract')
-      const cd = cRes.data || {}
-      contractStats.value = { active: cd.activeCount || 0, newThisMonth: cd.monthNew || 0, pending: cd.pendingCount || 0 }
-      statCards.value[0].value = cd.activeCount ?? '-'
-    } catch { /* ok */ }
-
-    // 随访统计
-    try {
-      const fRes = await request.get('/admin/report/follow-up')
-      const fd = fRes.data || {}
-      followUpStats.value = { total: fd.totalPlans || 0, completed: fd.completedPlans || 0, overdue: fd.overduePlans || 0 }
-      statCards.value[1].value = fd.totalPlans ?? '-'
-    } catch { /* ok */ }
-
-    // 今日接诊概况（前端用已有接口简单聚合）
-    try {
-      const apptRes = await request.get('/admin/report/visit-trend')
-      const counts = apptRes.data?.counts || []
-      const todayCount = counts.length > 0 ? counts[counts.length - 1] : 0
-      todaySummary.value = {
-        totalAppt: todayCount,
-        completed: Math.round(todayCount * 0.6),
-        waiting: Math.round(todayCount * 0.3),
-        cancelled: Math.round(todayCount * 0.1),
-        estimated: true  // 前端估算，非真实统计
-      }
-    } catch(e) { /* ok */ }
-
-    // 医生工作量排行
-    try {
-      const rankRes = await request.get('/admin/report/doctor-workload')
-      doctorRank.value = rankRes.data || []
-    } catch(e) {
-      // 接口不可用时使用演示数据
-      isDemoRank.value = true
-      doctorRank.value = [
-        { name: '李医生', count: 28 },
-        { name: '赵医生', count: 15 },
-        { name: '王医生', count: 8 },
-      ]
-    }
-
-    // 近7天趋势
-    const trendRes = await request.get('/admin/report/visit-trend')
+    const trendRes = await request.get('/admin/report/visit-trend', { params })
     const trend = trendRes.data || {}
     trendOption.value = {
       tooltip: { trigger: 'axis' },
-      grid: { left: 40, right: 20, top: 20, bottom: 30 },
-      xAxis: { type: 'category', data: (trend.dates || []).map(d => d.slice(5)) },
-      yAxis: { type: 'value', minInterval: 1 },
+      grid:    { left: 40, right: 20, top: 30, bottom: 30 },
+      xAxis:   { type: 'category', data: (trend.dates || []).map(d => d.slice(5)) },
+      yAxis:   { type: 'value', minInterval: 1 },
       series: [{
         data: trend.counts || [],
         type: 'line', smooth: true,
         areaStyle: { color: 'rgba(47, 107, 87, 0.12)' },
         lineStyle: { color: 'var(--primary)', width: 3 },
-        itemStyle: { color: 'var(--primary)' }
+        itemStyle: { color: 'var(--primary)' },
+        // ① 节点上方显示数字标注
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 11,
+          color: 'var(--primary)',
+          formatter: ({ value }) => value > 0 ? value : ''
+        }
       }]
     }
+  } catch { /* ok */ }
 
-    // 科室分布
-    const deptRes = await request.get('/admin/report/dept-load')
+  // ② 科室就诊分布（联动日期）
+  try {
+    const deptRes = await request.get('/admin/report/dept-load', { params })
+    const deptData = deptRes.data?.deptData || []
     pieOption.value = {
       tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend:  { bottom: 0, textStyle: { fontSize: 11 } },
       series: [{
-        type: 'pie', radius: ['40%', '70%'],
-        data: deptRes.data?.deptData || [],
-        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } },
-        label: { formatter: '{b}\n{d}%' }
+        type: 'pie', radius: ['38%', '65%'],
+        center: ['50%', '45%'],
+        data: deptData,
+        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.4)' } },
+        label: { formatter: '{b}\n{d}%', fontSize: 11 }
       }]
     }
+  } catch { /* ok */ }
 
-    // 去除药品消耗 TOP5 图表（药品模块已删除）
-  } catch (e) { /* handled */ }
+  // ③ 接诊概况（用结束日）
+  try {
+    const sumRes = await request.get('/admin/report/daily-summary', { params: { date: endDate } })
+    const s = sumRes.data || {}
+    todaySummary.value = {
+      totalAppt: s.totalAppt ?? 0,
+      completed: s.completed ?? 0,
+      waiting:   s.waiting   ?? 0,
+      cancelled: s.cancelled ?? 0
+    }
+    statCards.value[4].value = s.totalAppt ?? '-'
+  } catch { /* ok */ }
+}
+
+// ────────────────────────────────────────────────
+// 日期切换回调
+// ────────────────────────────────────────────────
+async function onDateRangeChange(val) {
+  if (!val || val.length < 2) return
+  await loadCharts(val[0], val[1])
+}
+
+// ────────────────────────────────────────────────
+// 初始化（固定数据 + 图表）
+// ────────────────────────────────────────────────
+onMounted(async () => {
+  // 固定卡片数据（累计，不跟日期走）
+  try {
+    const staffRes = await request.get('/admin/staff', { params: { page: 1, size: 1 } })
+    statCards.value[2].value = staffRes.data?.total ?? '-'
+  } catch { /* ok */ }
+
+  try {
+    const noticeRes = await request.get('/admin/notice', { params: { page: 1, size: 5 } })
+    notices.value = noticeRes.data?.records || []
+    statCards.value[3].value = noticeRes.data?.total ?? '-'
+  } catch { /* ok */ }
+
+  try {
+    const cRes = await request.get('/admin/report/contract')
+    const cd = cRes.data || {}
+    contractStats.value = {
+      active: cd.activeCount ?? 0,
+      newThisMonth: cd.monthNew  ?? 0,
+      pending: cd.pendingCount ?? 0
+    }
+    statCards.value[0].value = cd.activeCount ?? '-'
+  } catch { /* ok */ }
+
+  try {
+    const fRes = await request.get('/admin/report/follow-up')
+    const fd = fRes.data || {}
+    followUpStats.value = {
+      total:     fd.activePlans     ?? 0,
+      completed: fd.completedPlans  ?? 0,
+      overdue:   fd.overduePlans    ?? 0
+    }
+    statCards.value[1].value = fd.activePlans ?? '-'
+  } catch { /* ok */ }
+
+  // 医生排行（本周，与日期范围无关）
+  try {
+    const rankRes = await request.get('/admin/report/doctor-workload')
+    doctorRank.value = rankRes.data || []
+    isDemoRank.value = false
+  } catch {
+    isDemoRank.value = true
+    doctorRank.value = [
+      { name: '李医生', count: 28 },
+      { name: '赵医生', count: 15 },
+      { name: '王医生', count: 8  }
+    ]
+  }
+
+  // 默认近7天图表
+  await loadCharts(defaultStart, defaultEnd)
 })
+
+function formatDate(dt) {
+  return dt ? new Date(dt).toLocaleDateString('zh-CN') : ''
+}
 
 async function exportReport() {
   exporting.value = true
@@ -240,7 +330,7 @@ async function exportReport() {
     document.body.appendChild(link)
     link.click()
     link.remove()
-  } catch (e) { /* handled */ }
+  } catch { /* ok */ }
   finally { exporting.value = false }
 }
 </script>
@@ -248,22 +338,31 @@ async function exportReport() {
 <style scoped>
 .dashboard { padding: 20px; }
 
-/* page-header 已迁入全局 components.css，这里只保留本页私有的 */
 .page-subtitle { margin: 0; font-size: 13px; color: var(--muted); }
 
-/* 预警条操作链接 */
-.alert-action {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-warning);
-  text-decoration: none;
-  white-space: nowrap;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.alert-action:hover { text-decoration: underline; }
 
-/* summary-grid 已迁入全局，此处仅保留图表行间距 */
+/* 图表行间距 */
 .chart-row { margin-bottom: 16px; }
+
+/* 面板标题行（标题 + 日期提示） */
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.panel-date-hint {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
 
 /* 公告项 */
 .notice-item {
@@ -275,41 +374,27 @@ async function exportReport() {
   font-size: 13px;
 }
 .notice-title { color: var(--text); }
-.notice-time { font-size: 12px; color: var(--muted); white-space: nowrap; margin-left: 8px; }
+.notice-time  { font-size: 12px; color: var(--muted); white-space: nowrap; margin-left: 8px; }
 
-/* 预警行 */
-.alert-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-}
-.alert-qty { color: var(--danger); font-weight: 600; font-variant-numeric: tabular-nums; }
-.more-link { display: block; text-align: center; font-size: 12px; color: var(--primary); margin-top: 8px; }
-
-/* 今日接诊概况 KV 行 */
-.kv-row {
+/* 列表行 */
+.list-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 9px 0;
   border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 13px;
 }
-.kv-row strong { font-variant-numeric: tabular-nums; }
-.text-good { color: var(--good); }
-.text-warn { color: var(--warn); }
-.text-muted { color: var(--muted); }
+
+.text-good   { color: var(--good);   }
+.text-warn   { color: var(--warn);   }
+.text-muted  { color: var(--muted);  }
+.text-danger { color: var(--danger); }
 
 /* 医生排行行 */
 .rank-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
 }
 .rank-badge {
   width: 22px; height: 22px; border-radius: 6px;
@@ -318,12 +403,12 @@ async function exportReport() {
   background: var(--surface-soft); color: var(--muted);
 }
 .rank-badge.top { background: var(--primary); color: #fff; }
-.rank-name { flex: 1; }
+.rank-name  { flex: 1; }
 .rank-count { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
   .dashboard { padding: 12px; }
-  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .header-actions { flex-wrap: wrap; }
 }
 </style>

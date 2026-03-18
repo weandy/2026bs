@@ -52,7 +52,8 @@ const routes = [
       { path: 'vaccination', name: 'MedicalVaccination', component: () => import('@/views/medical/vaccination/VaccinationManagePage.vue'), meta: { title: '接种管理' } },
       { path: 'prescription', name: 'MedicalPrescription', component: () => import('@/views/medical/prescription/PrescriptionPage.vue'), meta: { title: '处方记录' } },
       { path: 'my-schedule', name: 'MedicalMySchedule', component: () => import('@/views/medical/schedule/MySchedulePage.vue'), meta: { title: '我的排班' } },
-      { path: 'profile', name: 'MedicalProfile', component: () => import('@/views/medical/profile/MedicalProfilePage.vue'), meta: { title: '个人中心' } }
+      { path: 'stats',       name: 'MedicalStats',      component: () => import('@/views/medical/stats/WorkStatsPage.vue'),       meta: { title: '工作统计' } },
+      { path: 'profile',     name: 'MedicalProfile',    component: () => import('@/views/medical/profile/MedicalProfilePage.vue'), meta: { title: '个人中心' } }
     ]
   },
   // 管理员端
