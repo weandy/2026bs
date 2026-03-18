@@ -97,7 +97,7 @@ import { useUserStore } from '@/stores/user'
 import { forceLogout } from '@/utils/request'
 import {
   Home, CalendarDays, Clock, FileText, FolderOpen,
-  Syringe, Users, UserRound, Plus, Menu, ClipboardList
+  Syringe, Users, UserRound, Plus, Menu, ClipboardList, Bell
 } from 'lucide-vue-next'
 
 const userStore = useUserStore()
@@ -120,6 +120,7 @@ const healthNav = [
 ]
 
 const personalNav = [
+  { path: '/resident/message', label: '消息通知', icon: Bell },
   { path: '/resident/family',  label: '家庭成员', icon: Users },
   { path: '/resident/profile', label: '个人中心', icon: UserRound },
 ]

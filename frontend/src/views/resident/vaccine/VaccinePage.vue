@@ -105,6 +105,9 @@ async function loadAvailable() {
   try {
     const { data } = await request.get('/resident/vaccine/available')
     vaccineList.value = data || []
+  } catch (e) {
+    console.warn('疫苗列表加载失败', e)
+    vaccineList.value = []
   } finally { loadingVaccines.value = false }
 }
 

@@ -36,7 +36,8 @@ const routes = [
       { path: 'vaccine', name: 'ResidentVaccine', component: () => import('@/views/resident/vaccine/VaccinePage.vue'), meta: { title: '疫苗接种' } },
       { path: 'follow-up', name: 'ResidentFollowUp', component: () => import('@/views/resident/followup/ResidentFollowUpPage.vue'), meta: { title: '签约与随访' } },
       { path: 'family', name: 'ResidentFamily', component: () => import('@/views/resident/family/FamilyPage.vue'), meta: { title: '家庭成员' } },
-      { path: 'profile', name: 'ResidentProfile', component: () => import('@/views/resident/ProfilePage.vue'), meta: { title: '个人中心' } }
+      { path: 'profile', name: 'ResidentProfile', component: () => import('@/views/resident/ProfilePage.vue'), meta: { title: '个人中心' } },
+      { path: 'message', name: 'ResidentMessage', component: () => import('@/views/resident/message/MessagePage.vue'), meta: { title: '消息通知' } }
     ]
   },
   // 医护端
@@ -63,7 +64,7 @@ const routes = [
     children: [
       { path: '', redirect: '/admin/dashboard' },
       { path: 'dashboard', name: 'AdminDashboard', component: () => import('@/views/admin/dashboard/DashboardPage.vue'), meta: { title: '数据看板' } },
-      { path: 'staff', name: 'AdminStaff', component: () => import('@/views/admin/user/StaffManagePage.vue'), meta: { title: '用户管理' } },
+      { path: 'staff', name: 'AdminStaff', component: () => import('@/views/admin/user/StaffManagePage.vue'), meta: { title: '医护管理' } },
       { path: 'schedule', name: 'AdminSchedule', component: () => import('@/views/admin/schedule/ScheduleManagePage.vue'), meta: { title: '排班管理' } },
       { path: 'dept', name: 'AdminDept', component: () => import('@/views/admin/dept/DeptManagePage.vue'), meta: { title: '科室管理' } },
       { path: 'resident', name: 'AdminResident', component: () => import('@/views/admin/resident/ResidentManagePage.vue'), meta: { title: '居民管理' } },
