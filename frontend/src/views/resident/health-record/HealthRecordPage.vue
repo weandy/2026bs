@@ -177,7 +177,8 @@ async function downloadPdf() {
     const res = await request.get('/resident/health-summary/pdf', {
       responseType: 'blob'
     })
-    const url = window.URL.createObjectURL(new Blob([res.data || res]))
+    const blob = new Blob([res.data || res], { type: 'application/pdf' })
+    const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     // 动态拼接文件名：用户名_日期.pdf
@@ -185,7 +186,11 @@ async function downloadPdf() {
     const userName = userInfo.name || userInfo.username || '居民'
     const today = new Date().toISOString().slice(0, 10)
     a.download = `${userName}_${today}.pdf`
+    // 必须挂载到 DOM，Chrome 才能正确识别 download 属性
+    a.style.display = 'none'
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
     ElMessage.success('下载成功')
   } catch (e) {
