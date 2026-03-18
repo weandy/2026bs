@@ -96,7 +96,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { forceLogout } from '@/utils/request'
 import {
-  Home, CalendarDays, Clock, FileText, FolderOpen,
+  Home, CalendarDays, FileText, FolderOpen,
   Syringe, Users, UserRound, Plus, Menu, ClipboardList, Bell
 } from 'lucide-vue-next'
 
@@ -107,10 +107,9 @@ const moreDrawerVisible = ref(false)
 
 /* ── 分组导航 ── */
 const coreNav = [
-  { path: '/resident/home',           label: '服务首页', icon: Home },
-  { path: '/resident/appointment',    label: '预约挂号', icon: CalendarDays },
-  { path: '/resident/queue-progress', label: '候诊进度', icon: Clock },
-  { path: '/resident/visit-records',  label: '就诊记录', icon: FileText },
+  { path: '/resident/home',          label: '服务首页', icon: Home },
+  { path: '/resident/appointment',   label: '预约挂号', icon: CalendarDays },
+  { path: '/resident/visit-records', label: '就诊记录', icon: FileText },
 ]
 
 const healthNav = [
@@ -129,9 +128,9 @@ const allNav = computed(() => [...coreNav, ...healthNav, ...personalNav])
 
 /* ── 移动端 Tab（前 4 个 + 更多） ── */
 const mobileTabs = [
-  { path: '/resident/home',        shortLabel: '首页', icon: Home },
-  { path: '/resident/appointment', shortLabel: '预约', icon: CalendarDays },
-  { path: '/resident/visit-records', shortLabel: '就诊', icon: FileText },
+  { path: '/resident/home',          shortLabel: '首页', icon: Home },
+  { path: '/resident/appointment',   shortLabel: '预约', icon: CalendarDays },
+  { path: '/resident/message',       shortLabel: '消息', icon: Bell },
   { path: '/resident/health-record', shortLabel: '档案', icon: FolderOpen },
 ]
 

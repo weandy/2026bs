@@ -30,7 +30,6 @@ const routes = [
       { path: '', redirect: '/resident/home' },
       { path: 'home', name: 'ResidentHome', component: () => import('@/views/resident/HomePage.vue'), meta: { title: '首页' } },
       { path: 'appointment', name: 'ResidentAppointment', component: () => import('@/views/resident/appointment/AppointmentPage.vue'), meta: { title: '预约挂号' } },
-      { path: 'queue-progress', name: 'ResidentQueueProgress', component: () => import('@/views/resident/appointment/QueueProgressPage.vue'), meta: { title: '候诊进度' } },
       { path: 'visit-records', name: 'ResidentVisitRecords', component: () => import('@/views/resident/visit-record/VisitRecordPage.vue'), meta: { title: '就诊记录' } },
       { path: 'health-record', name: 'ResidentHealthRecord', component: () => import('@/views/resident/health-record/HealthRecordPage.vue'), meta: { title: '我的档案' } },
       { path: 'vaccine', name: 'ResidentVaccine', component: () => import('@/views/resident/vaccine/VaccinePage.vue'), meta: { title: '疫苗接种' } },
