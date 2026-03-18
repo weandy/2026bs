@@ -3,7 +3,7 @@ spring:
   datasource:
     # 居民域数据源
     resident:
-      jdbc-url: jdbc:mysql://192.168.8.212:3306/chp_resident?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      jdbc-url: jdbc:mysql://192.168.8.209:3306/chp_resident?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       username: root
       password: mysql_eAk4W2
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,7 @@ spring:
 
     # 管理域数据源
     admin:
-      jdbc-url: jdbc:mysql://192.168.8.212:3306/chp_admin?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      jdbc-url: jdbc:mysql://192.168.8.209:3306/chp_admin?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       username: root
       password: mysql_eAk4W2
       driver-class-name: com.mysql.cj.jdbc.Driver
