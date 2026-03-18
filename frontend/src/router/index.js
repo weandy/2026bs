@@ -103,8 +103,14 @@ router.beforeEach((to, from, next) => {
   // 角色域隔离
   try {
     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
-    const domain = userInfo.domain || ''   // 'resident' | 'admin'
+    // Bug4修复：domain缺失时根据role推断，防止守卫失效
+    let domain = userInfo.domain || ''
     const role = userInfo.roleCode || userInfo.role || ''
+    if (!domain) {
+      if (role === 'resident') domain = 'resident'
+      else if (['admin', 'doctor', 'nurse'].includes(role)) domain = 'admin'
+      else domain = 'unknown'
+    }
 
     const path = to.path
     const isResidentRoute = path.startsWith('/resident')
@@ -117,6 +123,11 @@ router.beforeEach((to, from, next) => {
     }
     if (domain === 'admin' && isResidentRoute) {
       next(role === 'admin' ? '/admin/dashboard' : '/medical/workbench')
+      return
+    }
+    // domain不明时重定向到登录
+    if (domain === 'unknown' && (isResidentRoute || isMedicalRoute || isAdminRoute)) {
+      next('/login')
       return
     }
 

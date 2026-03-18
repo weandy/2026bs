@@ -29,4 +29,6 @@ public class AppointmentCreateDTO {
     @NotBlank(message = "就诊人手机号不能为空")
     private String patientPhone;
     private String symptomDesc;
+    /** Bug5修复：家庭成员代为预约时传入成员ID，可选字段 */
+    private Long proxyMemberId;
 }

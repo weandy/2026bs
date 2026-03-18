@@ -116,7 +116,7 @@ public class ResidentFollowUpController {
                 "chronic_type AS chronicType, doctor_id AS doctorId, doctor_name AS doctorName, " +
                 "frequency, follow_up_method AS followUpMethod, " +
                 "next_follow_date AS nextFollowDate, status, created_at AS createdAt " +
-                "FROM follow_up_plan " +
+                "FROM chp_admin.follow_up_plan " +
                 "WHERE resident_id = ? AND is_deleted = 0 " +
                 "ORDER BY next_follow_date ASC", residentId);
         return Result.success(plans);
@@ -133,7 +133,7 @@ public class ResidentFollowUpController {
                 "medication_compliance AS medicationCompliance, " +
                 "health_guidance AS healthGuidance, staff_name AS staffName, " +
                 "created_at AS createdAt " +
-                "FROM follow_up_record " +
+                "FROM chp_admin.follow_up_record " +
                 "WHERE plan_id = ? AND resident_id = ? " +
                 "ORDER BY follow_date DESC", planId, residentId);
         return Result.success(records);
@@ -148,7 +148,7 @@ public class ResidentFollowUpController {
                 "SELECT follow_date AS followDate, " +
                 "systolic_bp AS systolicBp, diastolic_bp AS diastolicBp, " +
                 "fasting_glucose AS fastingGlucose " +
-                "FROM follow_up_record " +
+                "FROM chp_admin.follow_up_record " +
                 "WHERE plan_id = ? AND resident_id = ? " +
                 "ORDER BY follow_date ASC LIMIT ?", planId, residentId, limit);
         return Result.success(data);

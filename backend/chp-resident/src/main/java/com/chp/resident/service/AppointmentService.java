@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 预约挂号服务
@@ -36,7 +35,6 @@ public class AppointmentService {
     private final ScheduleSlotMapper scheduleSlotMapper;
     private final ScheduleMapper scheduleMapper;
 
-    private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 100000);
 
     /**
      * 创建预约
@@ -73,9 +71,9 @@ public class AppointmentService {
             throw new BusinessException(StatusCode.SLOT_FULL, "号源已被他人抢占，请重试");
         }
 
-        // 生成就诊号
+        // Bug12修复：使用时间戳+随机数，避免重启后SEQ归零导致重复
         String apptNo = "APT" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-                + String.format("%05d", SEQ.incrementAndGet() % 100000);
+                + String.format("%05d", (System.currentTimeMillis() % 100000 + (long)(Math.random() * 99)) % 100000);
 
         Appointment appt = new Appointment();
         appt.setApptNo(apptNo);
@@ -90,6 +88,7 @@ public class AppointmentService {
         appt.setPatientName(dto.getPatientName());
         appt.setPatientPhone(dto.getPatientPhone());
         appt.setSymptomDesc(dto.getSymptomDesc());
+        appt.setProxyMemberId(dto.getProxyMemberId()); // Bug5修复：记录代为预约的家庭成员ID
         appt.setStatus(1);
         appointmentMapper.insert(appt);
 
@@ -112,7 +111,7 @@ public class AppointmentService {
             throw new BusinessException(StatusCode.BAD_REQUEST, "当前状态不可取消");
         }
 
-        appt.setStatus(4);
+        appt.setStatus(5);  // Bug2修复：5=已取消（原来错误地设了4=已完成）
         appt.setCancelReason(reason);
         appointmentMapper.updateById(appt);
 
@@ -143,12 +142,17 @@ public class AppointmentService {
     }
 
     /**
-     * 查询预约详情
+     * 查询预约详情（Bug1修复：加residentId归属校验，防IDOR）
      */
     public Appointment getDetail(Long id) {
+        JwtUserDetails user = SecurityUtils.getCurrentUser();
         Appointment appt = appointmentMapper.selectById(id);
         if (appt == null) {
             throw new BusinessException(StatusCode.NOT_FOUND, "预约不存在");
+        }
+        // 确保只能查看自己的预约
+        if (user != null && !appt.getResidentId().equals(user.getUserId())) {
+            throw new BusinessException(StatusCode.FORBIDDEN, "无权查看该预约");
         }
         return appt;
     }

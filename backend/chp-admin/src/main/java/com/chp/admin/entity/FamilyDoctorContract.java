@@ -15,6 +15,7 @@ public class FamilyDoctorContract {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long residentId;
+    private String residentName;  // Bug6修复：冗余居民姓名，用于keyword搜索
     private Long doctorId;
     private String doctorName;
     private String teamName;

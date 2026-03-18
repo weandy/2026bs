@@ -32,9 +32,10 @@ public class ContractController {
         LambdaQueryWrapper<FamilyDoctorContract> qw = new LambdaQueryWrapper<FamilyDoctorContract>()
                 .eq(status != null && !status.isBlank(), FamilyDoctorContract::getStatus, status)
                 .orderByDesc(FamilyDoctorContract::getCreatedAt);
-        // keyword 搜索需要通过 SQL like（居民/医生姓名在签约表中没有冗余，暂用 doctorName）
+        // Bug6修复：keyword 同时搜索医生姓名和居民姓名
         if (keyword != null && !keyword.isBlank()) {
-            qw.like(FamilyDoctorContract::getDoctorName, keyword);
+            qw.and(w -> w.like(FamilyDoctorContract::getDoctorName, keyword)
+                         .or().like(FamilyDoctorContract::getResidentName, keyword));
         }
         return Result.success(mapper.selectPage(new Page<>(page, size), qw));
     }

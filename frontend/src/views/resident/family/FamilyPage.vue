@@ -325,19 +325,25 @@ async function loadMembers() {
   } catch { members.value = [] }
 }
 
-// ── 权限切换 ──
+// ── 权限切换（Bug13修复：乐观更新+失败回滚）──
 async function toggleScope(key) {
   if (!selected.value) return
+  const oldScope = selected.value.permissionScope  // 备份旧值
+
   const scopes = new Set((selected.value.permissionScope || 'basic').split(',').map(s => s.trim()))
   if (scopes.has(key)) scopes.delete(key)
   else scopes.add(key)
   scopes.add('basic') // basic 永远保留
 
   const newScope = [...scopes].join(',')
-  selected.value.permissionScope = newScope
+  selected.value.permissionScope = newScope  // 乐观更新UI
+
   try {
     await request.put(`/resident/family/${selected.value.id}`, { ...selected.value })
   } catch (e) {
+    // Bug13修复：请求失败时回滚UI
+    selected.value.permissionScope = oldScope
+    alert('权限更新失败，请重试')
     console.warn('权限更新失败', e)
   }
 }

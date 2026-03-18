@@ -28,6 +28,8 @@ public class Appointment {
     private String symptomDesc;
     private Integer status;
     private String cancelReason;
+    /** Bug5修复：代为预约时记录家庭成员ID */
+    private Long proxyMemberId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     @TableLogic
