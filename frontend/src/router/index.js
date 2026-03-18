@@ -70,8 +70,9 @@ const routes = [
       { path: 'resident', name: 'AdminResident', component: () => import('@/views/admin/resident/ResidentManagePage.vue'), meta: { title: '居民管理' } },
       { path: 'contract', name: 'AdminContract', component: () => import('@/views/admin/contract/ContractManagePage.vue'), meta: { title: '签约管理' } },
       { path: 'notice', name: 'AdminNotice', component: () => import('@/views/admin/article/NoticeMangePage.vue'), meta: { title: '公告管理' } },
-      { path: 'drug', name: 'AdminDrug', component: () => import('@/views/admin/drug/DrugStockPage.vue'), meta: { title: '药品管理' } },
-      { path: 'vaccine-stock', name: 'AdminVaccineStock', component: () => import('@/views/admin/vaccine/VaccineStockPage.vue'), meta: { title: '疫苗库存' } },
+      { path: 'drug',          name: 'AdminDrug',         component: () => import('@/views/admin/inventory/InventoryPage.vue'),      meta: { title: '库存管理' } },
+      { path: 'vaccine-stock', name: 'AdminVaccineStock',  component: () => import('@/views/admin/inventory/InventoryPage.vue'),      meta: { title: '库存管理' } },
+      { path: 'inventory',     name: 'AdminInventory',     component: () => import('@/views/admin/inventory/InventoryPage.vue'),      meta: { title: '库存管理' } },
       { path: 'audit-log', name: 'AdminAuditLog', component: () => import('@/views/admin/audit/AuditLogPage.vue'), meta: { title: '操作日志' } }
     ]
   },

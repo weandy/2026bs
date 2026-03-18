@@ -149,8 +149,7 @@ const adminNav = computed(() => [
   { path: '/admin/schedule',      label: '排班管理',     shortLabel: '排班', icon: CalendarDays },
   { path: '/admin/dept',          label: '科室管理',     shortLabel: '科室', icon: Building2 },
   { group: '物资管理' },
-  { path: '/admin/drug',          label: '药品库存',     shortLabel: '药品', icon: Pill },
-  { path: '/admin/vaccine-stock', label: '疫苗库存',     shortLabel: '疫苗', icon: Syringe },
+  { path: '/admin/inventory',     label: '库存管理',     shortLabel: '库存', icon: PackageSearch },
   { group: '系统管理' },
   { path: '/admin/audit-log',     label: '操作日志',     shortLabel: '日志', icon: ScrollText },
 ])
