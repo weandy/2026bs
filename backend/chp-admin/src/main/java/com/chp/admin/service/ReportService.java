@@ -99,54 +99,62 @@ public class ReportService {
     }
 
     /**
-     * 近7天排班量趋势（基于排班表统计，反映门诊开放量）
+     * 就诊趋势（按日期范围，从真实 visit_record 统计）
+     * 默认近7天；前端可传 startDate/endDate 自定义范围
      */
-    public Map<String, Object> visitTrend7Days() {
+    public Map<String, Object> visitTrend(LocalDate startDate, LocalDate endDate) {
         Map<String, Object> result = new HashMap<>();
         List<String> dates = new ArrayList<>();
         List<Integer> counts = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        for (int i = 6; i >= 0; i--) {
-            LocalDate day = today.minusDays(i);
-            dates.add(day.toString());
-            // 真实查询：按天统计排班数（代表就诊量趋势）
-            long count = scheduleMapper.selectCount(
-                    new LambdaQueryWrapper<Schedule>()
-                            .eq(Schedule::getScheduleDate, day)
-                            .eq(Schedule::getIsStopped, 0));
-            counts.add((int) count);
+        for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+            dates.add(d.toString());
+            try {
+                Integer cnt = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM chp_resident.visit_record " +
+                    "WHERE DATE(visit_date) = ? AND is_deleted = 0",
+                    Integer.class, d);
+                counts.add(cnt != null ? cnt : 0);
+            } catch (Exception e) {
+                counts.add(0);
+            }
         }
         result.put("dates", dates);
         result.put("counts", counts);
+        result.put("startDate", startDate.toString());
+        result.put("endDate", endDate.toString());
         return result;
     }
 
+    /** 兼容旧调用：默认近7天 */
+    public Map<String, Object> visitTrend7Days() {
+        LocalDate today = LocalDate.now();
+        return visitTrend(today.minusDays(6), today);
+    }
+
     /**
-     * 科室预约分布 — 基于排班表统计各科室排班数量
+     * 科室就诊分布 — 从真实 visit_record 统计指定日期范围内各科室就诊量
      */
-    public Map<String, Object> deptLoadDistribution() {
+    public Map<String, Object> deptLoadDistribution(LocalDate startDate, LocalDate endDate) {
         Map<String, Object> result = new HashMap<>();
-        // 真实查询：按科室分组统计本月排班数
-        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
-        List<Schedule> schedules = scheduleMapper.selectList(
-                new LambdaQueryWrapper<Schedule>()
-                        .ge(Schedule::getScheduleDate, firstDayOfMonth)
-                        .eq(Schedule::getIsStopped, 0));
-
-        Map<String, Long> deptCounts = schedules.stream()
-                .collect(Collectors.groupingBy(Schedule::getDeptName, Collectors.counting()));
-
-        List<Map<String, Object>> deptData = deptCounts.entrySet().stream()
-                .map(e -> {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put("name", e.getKey());
-                    item.put("value", e.getValue());
-                    return item;
-                })
-                .collect(Collectors.toList());
-
-        result.put("deptData", deptData);
+        try {
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                "SELECT dept_name AS name, COUNT(*) AS value " +
+                "FROM chp_resident.visit_record " +
+                "WHERE DATE(visit_date) BETWEEN ? AND ? AND is_deleted = 0 " +
+                "GROUP BY dept_name ORDER BY value DESC",
+                startDate, endDate);
+            result.put("deptData", rows);
+        } catch (Exception e) {
+            log.warn("查询科室分布失败", e);
+            result.put("deptData", Collections.emptyList());
+        }
         return result;
+    }
+
+    /** 兼容旧调用：默认近7天 */
+    public Map<String, Object> deptLoadDistribution() {
+        LocalDate today = LocalDate.now();
+        return deptLoadDistribution(today.minusDays(6), today);
     }
 
     /**
@@ -294,26 +302,71 @@ public class ReportService {
         return result;
     }
 
-    /** 签约统计 */
+    /** 签约统计（使用 family_doctor_contract 表）*/
     public Map<String, Object> contractReport() {
         Map<String, Object> result = new HashMap<>();
         try {
-            Integer total = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM service_contract", Integer.class);
-            Integer active = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM service_contract WHERE status = 1", Integer.class);
-            Integer expired = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM service_contract WHERE status != 1", Integer.class);
-            Integer thisMonth = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM service_contract WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())",
+            // 累计有效签约（status=2 已签约生效）
+            Integer activeCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM family_doctor_contract WHERE status = 2", Integer.class);
+            // 本月新增
+            Integer monthNew = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM family_doctor_contract " +
+                    "WHERE YEAR(sign_date) = YEAR(CURDATE()) AND MONTH(sign_date) = MONTH(CURDATE())",
                     Integer.class);
+            // 待审核
+            Integer pendingCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM family_doctor_contract WHERE status = 1", Integer.class);
+            // 总计
+            Integer total = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM family_doctor_contract", Integer.class);
 
-            result.put("total", total != null ? total : 0);
-            result.put("active", active != null ? active : 0);
-            result.put("expired", expired != null ? expired : 0);
-            result.put("thisMonth", thisMonth != null ? thisMonth : 0);
+            result.put("activeCount",  activeCount  != null ? activeCount  : 0);
+            result.put("monthNew",     monthNew     != null ? monthNew     : 0);
+            result.put("pendingCount", pendingCount != null ? pendingCount : 0);
+            result.put("total",        total        != null ? total        : 0);
         } catch (Exception e) {
             log.warn("查询签约统计失败", e);
+        }
+        return result;
+    }
+
+    /** 指定日期接诊概况（从真实 visit_record 统计）*/
+    public Map<String, Object> dailySummary(LocalDate date) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // 当日就诊记录总数（已完成）
+            Integer completed = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM chp_resident.visit_record " +
+                    "WHERE DATE(visit_date) = ? AND is_deleted = 0",
+                    Integer.class, date);
+            // 当日预约总数（appointment 表）
+            Integer totalAppt = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM appointment WHERE appt_date = ? AND is_deleted = 0",
+                    Integer.class, date);
+            // 候诊中（status=1 待就诊）
+            Integer waiting = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM appointment WHERE appt_date = ? AND status = 1 AND is_deleted = 0",
+                    Integer.class, date);
+            // 取消/爽约（status=5/6）
+            Integer cancelled = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM appointment WHERE appt_date = ? AND status IN (5,6) AND is_deleted = 0",
+                    Integer.class, date);
+
+            result.put("date",      date.toString());
+            result.put("totalAppt", totalAppt  != null ? totalAppt  : 0);
+            result.put("completed", completed  != null ? completed  : 0);
+            result.put("waiting",   waiting    != null ? waiting    : 0);
+            result.put("cancelled", cancelled  != null ? cancelled  : 0);
+            result.put("estimated", false);
+        } catch (Exception e) {
+            log.warn("查询日接诊概况失败: date={}", date, e);
+            result.put("date",      date.toString());
+            result.put("totalAppt", 0);
+            result.put("completed", 0);
+            result.put("waiting",   0);
+            result.put("cancelled", 0);
+            result.put("estimated", true);
         }
         return result;
     }

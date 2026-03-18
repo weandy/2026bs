@@ -30,16 +30,36 @@ public class ReportController {
         return Result.success(reportService.drugReport(startDate, endDate));
     }
 
-    /** GET /api/admin/report/visit-trend — 近7天预约量趋势 */
+    /** GET /api/admin/report/visit-trend
+     *  可选参数 startDate/endDate（yyyy-MM-dd），默认近7天 */
     @GetMapping("/visit-trend")
-    public Result<Map<String, Object>> visitTrend() {
-        return Result.success(reportService.visitTrend7Days());
+    public Result<Map<String, Object>> visitTrend(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Result.success(reportService.visitTrend7Days());
+        }
+        return Result.success(reportService.visitTrend(startDate, endDate));
     }
 
-    /** GET /api/admin/report/dept-load — 科室预约分布 */
+    /** GET /api/admin/report/dept-load
+     *  可选参数 startDate/endDate（yyyy-MM-dd），默认近7天 */
     @GetMapping("/dept-load")
-    public Result<Map<String, Object>> deptLoad() {
-        return Result.success(reportService.deptLoadDistribution());
+    public Result<Map<String, Object>> deptLoad(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return Result.success(reportService.deptLoadDistribution());
+        }
+        return Result.success(reportService.deptLoadDistribution(startDate, endDate));
+    }
+
+    /** GET /api/admin/report/daily-summary?date=yyyy-MM-dd — 指定日期接诊概况 */
+    @GetMapping("/daily-summary")
+    public Result<Map<String, Object>> dailySummary(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        if (date == null) date = LocalDate.now();
+        return Result.success(reportService.dailySummary(date));
     }
 
     /** GET /api/admin/report/public-health — 公卫服务统计 */
