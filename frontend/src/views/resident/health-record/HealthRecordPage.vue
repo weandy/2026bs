@@ -180,7 +180,11 @@ async function downloadPdf() {
     const url = window.URL.createObjectURL(new Blob([res.data || res]))
     const a = document.createElement('a')
     a.href = url
-    a.download = 'health_summary.pdf'
+    // 动态拼接文件名：用户名_日期.pdf
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+    const userName = userInfo.name || userInfo.username || '居民'
+    const today = new Date().toISOString().slice(0, 10)
+    a.download = `${userName}_${today}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
     ElMessage.success('下载成功')

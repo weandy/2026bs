@@ -10,6 +10,7 @@ import com.chp.resident.mapper.HealthRecordMapper;
 import com.chp.resident.mapper.VisitRecordMapper;
 import com.chp.resident.mapper.VaccineRecordMapper;
 import com.chp.security.util.SecurityUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -42,6 +43,7 @@ public class HealthSummaryController {
     private final HealthRecordMapper healthRecordMapper;
     private final VisitRecordMapper visitRecordMapper;
     private final VaccineRecordMapper vaccineRecordMapper;
+    private final JdbcTemplate jdbcTemplate;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -52,6 +54,23 @@ public class HealthSummaryController {
         if (residentId == null) {
             return ResponseEntity.status(401).build();
         }
+        // 查询居民姓名，用于文件名
+        String residentName = "居民";
+        try {
+            String nameResult = jdbcTemplate.queryForObject(
+                    "SELECT name FROM sys_resident WHERE id = ?", String.class, residentId);
+            if (nameResult != null && !nameResult.isBlank()) residentName = nameResult;
+        } catch (Exception ignored) {}
+        String today = java.time.LocalDate.now().format(FMT);
+        String fileName = residentName + "_" + today + ".pdf";
+        // RFC 5987 编码，支持中文文件名
+        String encodedFileName;
+        try {
+            encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+        } catch (Exception e) {
+            encodedFileName = "health_summary.pdf";
+        }
+
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
@@ -59,7 +78,7 @@ public class HealthSummaryController {
             var font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H");
             doc.setFont(font);
 
-            doc.add(new Paragraph("居民健康摘要").setFontSize(18).setBold());
+            doc.add(new Paragraph(residentName + " — 居民健康摘要").setFontSize(18).setBold());
             doc.add(new Paragraph("生成时间: " + java.time.LocalDate.now().format(FMT)).setFontSize(10));
 
             // 健康档案
@@ -112,7 +131,8 @@ public class HealthSummaryController {
 
             doc.close();
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=health_summary.pdf")
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encodedFileName)
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(baos.toByteArray());
         } catch (Exception e) {
