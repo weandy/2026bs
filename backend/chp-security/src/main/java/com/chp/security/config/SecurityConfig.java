@@ -55,6 +55,10 @@ public class SecurityConfig {
                                 "/admin/dept/list",
                                 "/admin/dept"
                         ).permitAll()
+                        // 医护人员可访问的排班调拨接口（提交/查询自己的调班申请）
+                        .requestMatchers("/admin/schedule/transfer").hasAnyRole("DOCTOR", "NURSE", "ADMIN")
+                        // 医护人员可查询排班
+                        .requestMatchers("/admin/schedule/**").hasAnyRole("DOCTOR", "NURSE", "ADMIN")
                         // 管理员接口 — 仅 ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 医护接口 — DOCTOR / NURSE / ADMIN

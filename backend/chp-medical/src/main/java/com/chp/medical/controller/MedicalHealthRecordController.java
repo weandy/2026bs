@@ -4,6 +4,7 @@ import com.chp.common.result.Result;
 import com.chp.resident.entity.HealthRecord;
 import com.chp.medical.service.MedicalHealthRecordService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * 健康档案管理接口（医护端）
  */
+@Slf4j
 @RestController
 @RequestMapping("/medical/health-record")
 @RequiredArgsConstructor
@@ -31,12 +33,12 @@ public class MedicalHealthRecordController {
         return Result.success(healthRecordService.updateRecord(residentId, record));
     }
 
-    /** GET /medical/residents/search?keyword=xxx — 按姓名/手机号/ID搜索居民（供档案搜索使用） */
+    /** GET /medical/health-record/residents/search?keyword=xxx — 按姓名/手机号/ID搜索居民（供档案搜索使用） */
     @GetMapping("/residents/search")
     public Result<List<Map<String, Object>>> searchResidents(@RequestParam String keyword) {
         try {
             boolean isNumeric = keyword.matches("\\d+");
-            String sql = "SELECT id, name, phone, birth_date FROM sys_resident WHERE " +
+            String sql = "SELECT id, name, phone, birth_date AS birthDate FROM chp_resident.resident WHERE " +
                 "(name LIKE ? OR phone LIKE ?" + (isNumeric ? " OR id = ?" : "") + ") LIMIT 20";
             List<Object> params = new java.util.ArrayList<>();
             params.add("%" + keyword + "%");
@@ -44,6 +46,7 @@ public class MedicalHealthRecordController {
             if (isNumeric) params.add(Long.parseLong(keyword));
             return Result.success(jdbcTemplate.queryForList(sql, params.toArray()));
         } catch (Exception e) {
+            log.warn("居民搜索失败: {}", e.getMessage());
             return Result.success(java.util.Collections.emptyList());
         }
     }
