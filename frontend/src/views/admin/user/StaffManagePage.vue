@@ -137,9 +137,9 @@ async function saveStaff() {
 }
 
 async function resetPwd(id) {
-  const { value } = await ElMessageBox.prompt('请输入新密码', '重置密码', { inputType: 'password' })
-  await request.put(`/admin/staff/${id}/reset-password`, { password: value })
-  ElMessage.success('密码已重置')
+  await ElMessageBox.confirm('将重置密码为临时密码 Abc@12345，该工作人员首次登录后请修改密码。', '重置密码')
+  await request.put(`/admin/staff/${id}/reset-password`, { password: 'Abc@12345' })
+  ElMessage.success('密码已重置为临时密码 Abc@12345')
 }
 
 async function toggleStatus(row) {

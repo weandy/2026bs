@@ -8,6 +8,17 @@
     <el-card shadow="never">
       <!-- 待接种列表 -->
       <template v-if="activeTab === 'pending'">
+        <!-- 常显筛选栏 -->
+        <el-form :inline="true" style="margin-bottom:12px">
+          <el-form-item label="疫苗">
+            <el-input v-model="pendingKeyword" placeholder="疫苗名称" clearable style="width:160px"
+              @input="loadPending" @clear="loadPending" />
+          </el-form-item>
+          <el-form-item label="预约日">
+            <el-date-picker v-model="pendingDate" type="date" value-format="YYYY-MM-DD"
+              placeholder="选择日期" clearable style="width:150px" @change="loadPending" />
+          </el-form-item>
+        </el-form>
         <el-table :data="pendingList" stripe v-loading="loading">
           <el-table-column prop="apptNo" label="预约号" width="140" />
           <el-table-column prop="patientName" label="姓名" width="100" />
@@ -28,13 +39,15 @@
       <template v-if="activeTab === 'records'">
         <el-form :inline="true" style="margin-bottom:12px">
           <el-form-item>
-            <el-input v-model="searchResidentId" placeholder="居民ID" clearable style="width:150px" />
+            <el-input v-model="searchPatientName" placeholder="接种人姓名" clearable style="width:160px"
+              @keyup.enter="loadRecords" @clear="loadRecords" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="loadRecords">查询</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="records" stripe v-loading="loading">
+          <el-table-column prop="patientName" label="接种人" width="100" />
           <el-table-column prop="vaccineName" label="疫苗" width="150" />
           <el-table-column prop="batchNo" label="批号" width="120" />
           <el-table-column prop="doseNum" label="剂次" width="70">
@@ -112,7 +125,9 @@ const records = ref([])
 const loading = ref(false)
 const page = ref(1)
 const total = ref(0)
-const searchResidentId = ref('')
+const searchPatientName = ref('')
+const pendingKeyword = ref('')
+const pendingDate = ref('')
 const showRegister = ref(false)
 const submitting = ref(false)
 const regForm = ref({ vaccineName: '', doseNum: 1, batchNo: '', injectionSite: '', dosage: '', residentId: null, apptId: null, vaccineId: null })
@@ -138,7 +153,10 @@ async function loadData() {
 async function loadPending() {
   loading.value = true
   try {
-    const { data } = await request.get('/medical/vaccination/pending', { params: { page: page.value, size: 20 } })
+    const params = { page: page.value, size: 20 }
+    if (pendingKeyword.value) params.keyword = pendingKeyword.value
+    if (pendingDate.value) params.date = pendingDate.value
+    const { data } = await request.get('/medical/vaccination/pending', { params })
     pendingList.value = data.records || []
     total.value = data.total || 0
   } finally { loading.value = false }
@@ -148,7 +166,7 @@ async function loadRecords() {
   loading.value = true
   try {
     const params = { page: page.value, size: 20 }
-    if (searchResidentId.value) params.residentId = searchResidentId.value
+    if (searchPatientName.value) params.patientName = searchPatientName.value
     const { data } = await request.get('/medical/vaccination/records', { params })
     records.value = data.records || []
     total.value = data.total || 0

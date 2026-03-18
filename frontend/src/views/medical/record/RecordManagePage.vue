@@ -10,13 +10,22 @@
     <!-- 搜索区 -->
     <div class="filter-section">
       <div class="compact-form">
-        <el-input v-model="residentId" placeholder="输入居民ID" style="width:200px" clearable
+        <el-input v-model="keyword" placeholder="姓名 / 手机号 / 居民ID" style="width:260px" clearable
           @keyup.enter="search">
           <template #prefix><Search :size="14" /></template>
         </el-input>
         <el-button type="primary" @click="search" :loading="loading">
-          <Search :size="14" style="margin-right:4px" /> 查询档案
+          <Search :size="14" style="margin-right:4px" /> 查询
         </el-button>
+      </div>
+    </div>
+
+    <!-- 最近查询居民列表 -->
+    <div v-if="residentList.length > 0 && !record" class="resident-list">
+      <div v-for="r in residentList" :key="r.id" class="resident-item" @click="loadRecord(r.id)">
+        <span class="resident-name">{{ r.name }}</span>
+        <span class="resident-info">{{ r.phone }} | 居民ID: {{ r.id }}</span>
+        <span class="chevron">→</span>
       </div>
     </div>
 
@@ -76,7 +85,9 @@ import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
 import { Search, Edit } from 'lucide-vue-next'
 
-const residentId = ref('')
+const keyword = ref('')
+const residentList = ref([])
+const residentId = ref(null)
 const record = ref(null)
 const searched = ref(false)
 const loading = ref(false)
@@ -85,11 +96,33 @@ const saving = ref(false)
 const editForm = ref({})
 
 async function search() {
-  if (!residentId.value) return
+  if (!keyword.value.trim()) return
+  residentList.value = []
+  record.value = null
   searched.value = true
   loading.value = true
   try {
-    const { data } = await request.get(`/medical/health-record/${residentId.value}`)
+    // 尝试居民搜索 API
+    const { data } = await request.get('/medical/health-record/residents/search', { params: { keyword: keyword.value } })
+    const list = data.records || data || []
+    if (list.length === 1) {
+      await loadRecord(list[0].id)
+    } else {
+      residentList.value = list
+    }
+  } catch {
+    record.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadRecord(id) {
+  residentId.value = id
+  loading.value = true
+  residentList.value = []
+  try {
+    const { data } = await request.get(`/medical/health-record/${id}`)
     record.value = data
   } catch {
     record.value = null
@@ -129,6 +162,16 @@ async function saveEdit() {
 
 <style scoped>
 .record-manage-page { padding: 24px; max-width: 960px; margin: 0 auto; }
+.resident-list { margin: 16px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.resident-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s;
+}
+.resident-item:last-child { border-bottom: none; }
+.resident-item:hover { background: var(--surface-soft); }
+.resident-name { font-weight: 600; color: var(--text); min-width: 60px; }
+.resident-info { flex: 1; font-size: 12px; color: var(--muted); }
+.chevron { color: var(--muted); }
 .record-detail-panel {
   background: var(--surface);
   border: 1px solid var(--border);

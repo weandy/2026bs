@@ -9,8 +9,11 @@
         <span v-if="!isCollapsed" class="logo-text">社区卫生服务中心</span>
       </div>
       <el-menu :default-active="$route.path" router :collapse="isCollapsed">
-        <template v-for="item in currentNav" :key="item.path">
-          <el-menu-item v-if="item.visible !== false" :index="item.path">
+        <template v-for="item in currentNav" :key="item.path || item.group">
+          <!-- 分组标题 -->
+          <div v-if="item.group && !isCollapsed" class="nav-group-label">{{ item.group }}</div>
+          <!-- 导航项 -->
+          <el-menu-item v-else-if="!item.group && item.visible !== false" :index="item.path">
             <el-icon><component :is="item.icon" :size="16" /></el-icon>
             <template #title>{{ item.label }}</template>
           </el-menu-item>
@@ -121,26 +124,31 @@ function toggleDark() {
 
 /* ── 导航配置 —— 侧边栏 & 移动端共用 ── */
 const medicalNav = computed(() => [
+  { group: '诊疗工作' },
   { path: '/medical/workbench',     label: '接诊工作台', shortLabel: '工作台', icon: MonitorIcon, visible: userRole.value !== 'NURSE' },
   { path: '/medical/record-manage', label: '居民档案',   shortLabel: '档案',   icon: FolderOpen },
-  { path: '/medical/follow-up',     label: '签约与随访', shortLabel: '随访',   icon: ClipboardList },
-  { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe, visible: userRole.value !== 'DOCTOR' },
   { path: '/medical/prescription',  label: '处方记录',   shortLabel: '处方',   icon: FileText, visible: userRole.value !== 'NURSE' },
   { path: '/medical/my-schedule',   label: '我的排班',   shortLabel: '排班',   icon: CalendarDays },
+  { group: '公卫服务' },
+  { path: '/medical/follow-up',     label: '签约与随访', shortLabel: '随访',   icon: ClipboardList },
+  { path: '/medical/vaccination',   label: '接种管理',   shortLabel: '接种',   icon: Syringe, visible: userRole.value !== 'DOCTOR' },
+  { group: '账号' },
   { path: '/medical/profile',       label: '个人中心',   shortLabel: '我的',   icon: UserRound },
 ])
 
 const adminNav = computed(() => [
+  { group: '核心管理' },
   { path: '/admin/dashboard',  label: '数据看板',   shortLabel: '看板', icon: LayoutDashboard },
   { path: '/admin/staff',      label: '用户管理',   shortLabel: '人员', icon: Users },
-  { path: '/admin/schedule',   label: '排班管理',   shortLabel: '排班', icon: CalendarDays },
-  { path: '/admin/dept',       label: '科室管理',   shortLabel: '科室', icon: Building2 },
   { path: '/admin/resident',   label: '居民管理',   shortLabel: '居民', icon: UserSearch },
   { path: '/admin/contract',   label: '签约管理',   shortLabel: '签约', icon: FileSignature },
+  { group: '运营配置' },
+  { path: '/admin/schedule',   label: '排班管理',   shortLabel: '排班', icon: CalendarDays },
+  { path: '/admin/dept',       label: '科室管理',   shortLabel: '科室', icon: Building2 },
 ])
 
 const currentNav = computed(() => isAdmin.value ? adminNav.value : medicalNav.value)
-const allVisibleNav = computed(() => currentNav.value.filter(i => i.visible !== false))
+const allVisibleNav = computed(() => currentNav.value.filter(i => !i.group && i.visible !== false))
 const primaryMobileNav = computed(() => allVisibleNav.value.slice(0, 4))
 const overflowMobileNav = computed(() => allVisibleNav.value.slice(4))
 const moreDrawerVisible = ref(false)
@@ -155,6 +163,18 @@ function handleLogout() {
    整体布局
 ═══════════════════════════════════════ */
 .admin-layout { height: 100vh; }
+
+/* 侧边栏分组标题 */
+.nav-group-label {
+  padding: 12px 16px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.sidebar.collapsed .nav-group-label { display: none; }
 
 /* ═══════════════════════════════════════
    侧边栏 — 浅色白底风格 / 暗黑适配
